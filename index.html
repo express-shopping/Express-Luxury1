@@ -4,55 +4,497 @@
     <meta charset="UTF-8">
     <meta name="google-site-verification" content="a0_IW2GneiWCDIUgMVVO2_v4mSLiRErbFN8hbkCiBKc" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="storeTitle">Walmart Shopping</title>
-    <link rel="icon" id="favicon" href="">
+    <title id="storeTitle">Express Shopping</title> 
+    <link rel="icon" id="favicon" href="https://via.placeholder.com/16x16?text=ES">
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
         /* ------------------------------------------------------------------------------------
-           CSS: التنسيقات العامة
+           CSS: التنسيقات العامة والمحسنة
            ------------------------------------------------------------------------------------ */
-        *:focus, a:focus, button:focus { outline: none !important; box-shadow: none !important; }
-        a, button, .like-container { -webkit-tap-highlight-color: transparent; }
+        :root {
+            --primary-color: #FF0050; /* الأحمر الجذاب (اللون الجديد للزر) */
+            --secondary-color: #FFC107; /* الأصفر المميز */
+            --dark-color: #333;
+            --light-color: #F8F8F8;
+            --white-color: #FFF;
+            --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-heavy: 0 8px 30px rgba(0, 0, 0, 0.2);
+            --success-color: #28a745; /* 🟢 اللون الأخضر للنجاح */
+            --error-color: #dc3545; /* 🔴 اللون الأحمر للخطأ */
+            --contact-color: #3498db; /* أزرق أنيق لزر التواصل */
+        }
+
+        /* تنسيق التركيز واللمس لسهولة الوصول والاستجابة */
+        a:focus, button:focus, input:focus, textarea:focus, *:focus:not([tabindex="-1"]) { outline: 3px solid var(--secondary-color); outline-offset: 2px; }
+        a, button, .like-container, .share-product-btn-footer { -webkit-tap-highlight-color: transparent; }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             margin: 0; 
             padding: 0; 
-            color: #333; 
-            background-color: #FFFFFF; 
-            background-attachment: local;
+            color: var(--dark-color); 
+            background-color: var(--light-color); 
             min-height: 100vh;
-        }
-        
-        /* ------------------- زر تبديل اللغة ------------------- */
-        .language-toggle {
-            position: fixed;
-            top: 20px;
-            z-index: 100;
+            /* 💡 تحسين لتجربة التمرير على الجوال */
+            overscroll-behavior-y: contain; 
         }
 
-        [dir="rtl"] .language-toggle { right: 20px; left: auto; }
-        [dir="ltr"] .language-toggle { left: 20px; right: auto; }
+        /* ------------------- الرأسية (Header) ------------------- */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--white-color);
+            padding: 10px 15px;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         
-        .language-toggle button {
-            background-color: #000;
-            color: white;
+        .header-title {
+            margin: 0; 
+            font-size: 1.5em; 
+            color: var(--primary-color);
+        }
+
+        /* ------------------- زر تبديل اللغة وزر القائمة الجانبية ------------------- */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .language-toggle button, .menu-toggle-btn {
+            background-color: var(--dark-color);
+            color: var(--white-color);
             border: none;
-            padding: 5px 8px; 
-            border-radius: 5px;
+            padding: 8px 12px; 
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.8em; 
+            font-size: 0.9em; 
             font-weight: bold;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .menu-toggle-btn {
+            font-size: 1.2em;
+            padding: 8px 12px;
+        }
+
+        .language-toggle button:hover, .menu-toggle-btn:hover {
+            background-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        /* ------------------- القائمة الجانبية (Sidebar) - أنماط محسّنة ------------------- */
+        .sidebar {
+            /* 🚨 التعديلات ليتوقف الارتفاع عند نهاية المحتوى */
+            height: auto; /* يجعل الارتفاع يعتمد على المحتوى الداخلي */
+            max-height: 100vh; /* يمنعها من تجاوز ارتفاع الشاشة إذا كان المحتوى كبيراً */
+            width: 0;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            right: 0; /* يبدأ من اليمين لـ RTL */
+            background-color: #2c3e50; /* لون غامق أنيق */
+            overflow-x: hidden;
+            /* تم إزالة overflow-y: auto هنا ونقله إلى .category-links-container */
+            transition: 0.3s;
+            padding-bottom: 20px; /* إضافة مسافة سفلية */
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.4);
+            color: var(--white-color);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box; 
+        }
+
+        [dir="ltr"] .sidebar {
+            left: 0;
+            right: auto;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .sidebar-close-btn {
+            position: absolute;
+            top: 10px;
+            font-size: 2em;
+            cursor: pointer;
+            color: var(--white-color);
+            transition: 0.2s;
+            padding: 0 10px;
+        }
+
+        [dir="rtl"] .sidebar-close-btn { left: 15px; }
+        [dir="ltr"] .sidebar-close-btn { right: 15px; }
+
+        .sidebar-close-btn:hover { color: var(--secondary-color); }
+        
+        /* 💡 جديد: شريط معلومات المستخدم/الإدارة في الأعلى */
+        .sidebar-header {
+            padding: 20px 25px 10px;
+            padding-top: 70px; /* تم التعديل لإضافة مسافة من الأعلى بدلاً من margin-top: -60px; */
+            background-color: #34495e; /* لون أغمق قليلاً */
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color); /* خط فاصل مميز */
+            flex-shrink: 0;
+        }
+
+        .sidebar-user-icon {
+            font-size: 3.5em;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .sidebar-username {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--white-color);
+        }
+
+        .sidebar-status {
+            font-size: 0.8em;
+            color: #bdc3c7;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* 💡 تحسين أزرار الإضافة والتواصل داخل Sidebar */
+        .sidebar-action-btn {
+            margin: 15px 20px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.2s, transform 0.2s;
+            flex-shrink: 0;
+            width: auto;
+            border: none;
+            cursor: pointer;
+        }
+        .sidebar-action-btn i {
+             margin-inline-end: 8px;
+        }
+
+        #contactBtn.secondary-btn {
+            background-color: var(--contact-color);
+            color: var(--white-color);
+            margin-bottom: 20px;
+        }
+        #contactBtn.secondary-btn:hover {
+            background-color: #2980b9;
+            transform: scale(1.02);
+        }
+
+        #addProductBtn.primary-btn {
+            margin-top: 15px;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+        }
+
+        #addProductBtn.primary-btn:hover {
+            background-color: #e74c3c;
+            transform: scale(1.02);
+        }
+
+        .sidebar-title {
+            padding: 10px 25px;
+            font-size: 0.9em;
+            color: #bdc3c7;
+            border-bottom: 1px solid #34495e;
+            margin-top: 10px;
+            margin-bottom: 0;
+            flex-shrink: 0;
         }
         
-        .language-toggle button:hover {
-            background-color: #333;
+        /* 💡 تحسين تنسيق الفئات */
+        .sidebar .category-links-container {
+            flex-grow: 1; 
+            overflow-y: auto; /* السماح بالتمرير إذا كان المحتوى طويلاً */
+            margin-bottom: 10px;
+            padding-top: 5px;
+        }
+
+        .sidebar a, .sidebar button:not(.sidebar-action-btn) {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 1.1em;
+            color: var(--white-color);
+            display: block;
+            transition: 0.3s;
+            text-align: right;
+            border: none;
+            background: none;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            font-weight: 500;
+        }
+
+        [dir="ltr"] .sidebar a, [dir="ltr"] .sidebar button:not(.sidebar-action-btn) { text-align: left; }
+
+        .sidebar a:hover, .sidebar button:hover:not(.sidebar-action-btn) {
+            background-color: #34495e;
+            color: var(--secondary-color);
         }
         
-        /* ------------------- تنسيقات زر الإعجاب (القلب) ------------------- */
+        /* 💡 تحسين الفئة النشطة */
+        .sidebar a.active-category {
+            background-color: #34495e;
+            color: var(--secondary-color);
+            font-weight: bold;
+            border-inline-end: 5px solid var(--secondary-color);
+            position: relative;
+        }
+        [dir="ltr"] .sidebar a.active-category {
+            border-inline-start: 5px solid var(--secondary-color);
+            border-inline-end: none;
+        }
+        
+        /* ------------------- نموذج الإضافة المنبثق (Modal) و نموذج التواصل (Contact Modal) ------------------- */
+        /* (الأنماط الموجودة لـ Modal) */
+         .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 3000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.6); 
+            padding-top: 50px;
+        }
+
+        #contactModal .modal-content {
+            width: 90%; 
+            max-width: 400px; 
+            margin: 10% auto; 
+            padding: 25px;
+            background: linear-gradient(135deg, var(--white-color) 0%, #f4f4f4 100%);
+            border: 2px solid var(--secondary-color); 
+            border-radius: 15px;
+        }
+
+        .modal-content {
+            background-color: var(--white-color);
+            margin: 5% auto; 
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%; 
+            max-width: 500px;
+            box-shadow: var(--shadow-heavy);
+            position: relative;
+        }
+
+        .modal-content h3 {
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+        
+        #contactMessage {
+             min-height: 100px;
+             resize: vertical;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        #sendMessageBtn {
+            float: right; 
+            background-color: var(--contact-color);
+            color: var(--white-color);
+            padding: 5px 15px; 
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8em; 
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 5px;
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.5);
+        }
+
+        [dir="ltr"] #sendMessageBtn { float: left; }
+
+        #sendMessageBtn:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+
+        .modal-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; 
+            gap: 10px;
+            margin-top: 20px;
+            padding-bottom: 10px;
+        }
+        [dir="ltr"] .modal-actions {
+             justify-content: flex-end; 
+        }
+        
+        .modal-content #insertBtn {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            float: none; 
+        }
+        
+        .modal-content #insertBtn.success {
+            background-color: var(--success-color); 
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.7); 
+        }
+
+        .modal-content #insertBtn:hover:not(.success) {
+            background-color: #e74c3c;
+        }
+        
+        #password-container {
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform: translateX(10px); 
+            display: none; 
+            flex-grow: 1; 
+        }
+
+        #password-container.visible {
+            opacity: 1;
+            transform: translateX(0);
+            display: block;
+        }
+        
+        #password-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            margin: 0; 
+        }
+
+        #password-input.error {
+            border-color: var(--error-color); 
+            box-shadow: 0 0 5px rgba(220, 53, 69, 0.5);
+        }
+
+
+        .close-modal {
+            color: #aaa;
+            position: absolute; 
+            top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        [dir="rtl"] .close-modal { right: 15px; }
+        [dir="ltr"] .close-modal { left: 15px; }
+
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: var(--dark-color);
+            text-decoration: none;
+        }
+        
+        /* ------------------- شبكة المنتجات وتنسيق البطاقات ------------------- */
+        .products-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+            padding: 25px 15px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        .product-card { 
+            background-color: var(--white-color); 
+            border-radius: 12px; 
+            box-shadow: var(--shadow-light); 
+            overflow: hidden; 
+            position: relative; 
+            border: 1px solid #eee; 
+            transition: transform 0.2s, box-shadow 0.3s;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between;
+        }
+        
+        .product-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); 
+        }
+        
+        .product-card .product-image-main {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* ------------------- استعلام وسائط خاص للهواتف ------------------- */
+        @media (max-width: 600px) {
+            .sidebar { width: 80%; }
+            .products-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+                gap: 15px; 
+            }
+            .modal-content {
+                margin: 20% auto;
+            }
+            #contactModal .modal-content {
+                 margin: 30% auto; 
+            }
+            
+            .product-card .product-image-main {
+                height: 180px; 
+            }
+
+            .product-actions a,
+            .product-actions button {
+                padding: 6px 8px; 
+                font-size: 0.7em;
+            }
+            
+            .product-actions .share-product-btn-footer {
+                width: 35px; 
+                padding: 6px 0;
+            }
+
+            .banner-title { font-size: 1.8em; }
+            
+        }
+
+        /* ------------------- الإعجاب والشارات ------------------- */
         .like-container { 
             position: absolute; 
             top: 10px; 
@@ -64,45 +506,13 @@
             color: #333; 
         }
 
-        [dir="rtl"] .like-container { left: 10px; }
-        [dir="ltr"] .like-container { right: 10px; }
+        [dir="rtl"] .like-container { left: 10px; } 
+        [dir="ltr"] .like-container { right: 10px; } 
         
-        .like-container .like-btn {
-            color: #999; 
-            font-size: 1.2em;
-            transition: color 0.3s; 
-        }
-        
-        .like-container .like-btn.liked {
-            color: #FF0050 !important; 
-        }
+        .like-container .like-btn { color: #999; font-size: 1.2em; transition: color 0.3s, transform 0.2s; }
+        .like-container .like-btn.liked { color: var(--primary-color) !important; transform: scale(1.1); }
+        .like-container .like-count { font-size: 0.7em; margin-top: 2px; }
 
-        .like-container .like-count {
-            font-size: 0.7em; 
-            margin-top: 2px;
-        }
-
-        /* ------------------- شبكة المنتجات وتنسيق البطاقات ------------------- */
-        .products-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 25px; 
-            padding: 25px 15px; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-        }
-        .product-card { 
-            background-color: white; 
-            border-radius: 12px; 
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1); 
-            overflow: hidden; 
-            position: relative; 
-            border: 1px solid #eee; 
-            transition: transform 0.2s;
-        }
-        .product-image-main { width: 100%; height: 260px; object-fit: cover; display: block; border-bottom: 1px solid #eee; cursor: pointer; } 
-        
-        /* ------------------- شارات المنتج (Badges) ------------------- */
         .product-badges-container { 
             position: absolute; 
             top: 10px; 
@@ -121,15 +531,54 @@
             font-weight: bold; 
             font-size: 0.8em; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            white-space: nowrap; 
         }
         
         .badge-yellow { background-color: #f1c40f; color: #333; }
-        .badge-black { background-color: #2c3e50; color: white; }
+        .badge-black { background-color: #2c3e50; color: var(--white-color); }
+        
+        /* ------------------- تفاصيل المنتج ------------------- */
+        .product-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; 
+        }
+        .product-name {
+            font-size: 1.1em; 
+            margin: 0 0 5px 0; 
+            font-weight: 600; 
+            min-height: 44px; 
+            overflow: hidden; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;
+        }
+        
+        .product-meta {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 5px;
+        }
+        .product-rating {
+            color: #FFC107;
+        }
+        .product-rating span {
+            font-size: 0.8em; 
+            color: #555; 
+            margin-inline-start: 5px;
+        }
+        .product-sold {
+            font-size: 0.8em; 
+            color: #7f8c8d;
+        }
         
         .product-price { 
             font-size: 1.6em; 
             font-weight: bold; 
-            color: #FF0050 !important; 
+            color: var(--primary-color) !important; 
+            margin-top: auto; 
             margin-bottom: 10px; 
         }
         
@@ -138,374 +587,206 @@
             color: #7f8c8d; 
             margin-bottom: 5px;
         }
-
-
-        /* ------------------- تصميم الغلاف (البانر) ------------------- */
+        
+        /* ------------------- البانر (Promo Banner) ------------------- */
         .promo-banner-section { 
             position: relative; 
             overflow: hidden; 
             height: 380px; 
             max-width: 1200px; 
-            margin: 0 auto; 
-            background: linear-gradient(135deg, #1D437F 0%, #2c569b 100%); 
-            border-radius: 15px; 
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2); 
-            padding-bottom: 15px; 
-            display: block; 
+            margin: 0 auto 25px auto;
             background-size: cover; 
             background-position: center;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            padding: 15px; 
+            box-sizing: border-box;
+            color: var(--white-color); 
+            transition: background-image 0.5s ease;
         }
         
-        /* 💥 تنسيق اسم المتجر الرئيسي والخط تحته 💥 */
-        .store-name-container {
-            position: absolute; 
-            top: 25px; 
-            z-index: 25;
-            color: #FFFFFF; 
-            padding: 5px 10px;
-            border-radius: 5px;
+        .moving-box {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.15); 
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0.8;
+            animation-name: moveBox;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            z-index: 1;
+        }
+
+        .moving-box:nth-child(1) { top: 20%; left: 10%; width: 50px; height: 50px; animation-duration: 30s; }
+        .moving-box:nth-child(2) { top: 50%; right: 5%; width: 30px; height: 30px; animation-duration: 20s; }
+        .moving-box:nth-child(3) { bottom: 10%; left: 30%; width: 60px; height: 60px; animation-duration: 35s; }
+        .moving-box:nth-child(4) { top: 70%; left: 70%; width: 25px; height: 25px; animation-duration: 40s; }
+
+        @keyframes moveBox {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20vw, 10vh) rotate(90deg); }
+            50% { transform: translate(0, 20vh) rotate(180deg); }
+            75% { transform: translate(-20vw, 5vh) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
         }
         
-        [dir="rtl"] .store-name-container { left: 25px; }
-        [dir="ltr"] .store-name-container { right: 25px; }
-        
-        .store-name-header {
-            display: flex; 
-            align-items: center;
-            line-height: 1; 
-        }
-        
-        .store-name-banner {
-            font-size: 1.5em; 
-            font-weight: 900; 
-            font-style: normal; 
-            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
-            /* الخط الثلاثي الألوان */
-            display: inline-block;
-            text-decoration: none;
-            background: 
-                linear-gradient(to right, #FFC107 0%, #FFC107 33%, #FF0050 33%, #FF0050 66%, #17A2B8 66%, #17A2B8 100%) 
-                left bottom/100% 3px no-repeat;
-            padding-bottom: 3px; 
-            margin-inline-end: 5px; 
-        }
-        
-        /* 💥 تنسيق أيقونة المثلث والخط الدوار الملون 💥 */
-        .rotating-triangle {
-            font-size: 1.8em; 
-            display: inline-block;
-            position: relative; 
-            padding: 8px; 
-            transform: translateY(2px); 
-            color: transparent; /* إخفاء النص الأصلي */
-        }
-        
-        /* عرض رمز المثلث نفسه */
-        .rotating-triangle::after {
-            content: '\25B2'; /* رمز المثلث لأعلى */
+        .banner-content-wrapper {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: gold; 
-            font-size: 1em; 
-            line-height: 1; 
-        }
-
-        /* 💥 الخط الدوار الملون (يتم تدويره وتغيير خلفيته) 💥 */
-        .rotating-triangle::before {
-            content: '';
-            position: absolute;
-            top: -5px; 
-            left: -5px; 
-            right: -5px; 
-            bottom: -5px; 
-            border-radius: 50%;
-            border: 3px solid transparent; /* مسافة لحركة الدوران */
-            background-size: 200% 200%;
-            /* تطبيق حركتي الدوران وتغيير اللون معاً */
-            animation: 
-                rotate-border 4s linear infinite,
-                color-change 12s infinite steps(1); /* 4 ثواني لكل لون * 3 ألوان = 12 ثانية دورة كاملة */
-            animation-play-state: running;
-        }
-        
-        /* تعريف الألوان الثلاثة (أصفر، أحمر، أزرق فاتح) */
-        @keyframes color-change {
-            0% { 
-                background: conic-gradient(transparent 0%, #FFC107 10%, transparent 20%, transparent 100%) border-box; /* أصفر */
-            }
-            33% { 
-                background: conic-gradient(transparent 0%, #FF0050 10%, transparent 20%, transparent 100%) border-box; /* أحمر */
-            }
-            66% { 
-                background: conic-gradient(transparent 0%, #17A2B8 10%, transparent 20%, transparent 100%) border-box; /* أزرق فاتح */
-            }
-            100% {
-                background: conic-gradient(transparent 0%, #FFC107 10%, transparent 20%, transparent 100%) border-box; /* العودة للأصفر */
-            }
-        }
-
-        /* مفتاح الإطار للحركة الدائرية (4 ثواني) */
-        @keyframes rotate-border {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* 💥 تنسيق نص الوكيل المعتمد وأيقونة AliExpress 💥 */
-        .authorized-agent-text {
-            font-size: 0.7em; 
-            font-weight: 400; 
-            color: #ecf0f1; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-            display: inline-block; 
-            margin-top: 15px; 
-            letter-spacing: 0.5px; 
-            padding-bottom: 2px;
-            border-bottom: 1px solid #000; 
-        }
-
-        .authorized-agent-text i {
-            /* أيقونة AliExpress */
-            font-size: 0.9em;
-            margin-inline-start: 5px;
-            color: #FF5E00; /* لون AliExpress */
-            vertical-align: middle;
-        }
-
-        /* إبقاء باقي التنسيقات كما هي... */
-        .promo-floating-content {
-            position: absolute;
-            top: 35%; 
-            left: 0;
-            right: 0;
-            transform: translateY(-50%); 
-            z-index: 15;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            max-width: 900px; 
-            margin: 0 auto; 
-            padding: 0 40px; 
-        }
-
-        [dir="rtl"] .promo-floating-content .promo-price-details { text-align: right; }
-        [dir="ltr"] .promo-floating-content .promo-price-details { text-align: left; }
-        [dir="rtl"] .promo-floating-content .promo-action-button { text-align: left; }
-        [dir="ltr"] .promo-floating-content .promo-action-button { text-align: right; }
-        
-        .promo-price-large { 
-            font-size: 1.3em; 
-            font-weight: 900; 
-            color: #FF0050; 
-            line-height: 1.1; 
-            text-shadow: 0 2px 5px rgba(0,0,0,0.7); 
-            margin-bottom: 5px; 
-        }
-        
-        .promo-floating-content .promo-stars { margin-top: 5px; }
-        
-        .promo-floating-content .promo-stars i {
-            color: #FFC107 !important; 
-            font-size: 0.8em; 
-        }
-
-        .promo-action-button .promo-small-btn {
-            display: inline-block;
-            background-color: #FF0050; 
-            color: white; 
-            padding: 8px 20px; 
-            border-radius: 20px;
-            font-weight: bold;
-            text-decoration: none;
-            margin-top: 0; 
-            box-shadow: 0 3px 6px rgba(255, 0, 80, 0.5);
-            font-size: 0.9em; 
-            transition: all 0.2s; 
-        }
-
-        /* ------------------- المربعات المتحركة السفلية (Promo Cards) ------------------- */
-        .promo-cards-container { 
-            position: absolute; 
-            z-index: 20; 
-            display: flex; 
-            gap: 10px; 
-            padding: 0 20px; 
-            max-width: 1150px; 
-            margin: 0 auto; 
-            bottom: 15px; 
-            left: 50%;
-            transform: translateX(-50%); 
-            width: calc(100% - 40px); 
-            pointer-events: none; 
-        }
-        
-        .promo-card {
-            flex: 1; 
-            height: 120px; 
-            border-radius: 10px; 
-            overflow: hidden; 
-            position: relative; 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            pointer-events: auto; 
-            min-width: 100px; 
-            background-color: rgba(255, 255, 255, 0.5); 
-        }
-        
-        .promo-card .new-badge {
-            position: absolute;
-            top: 10px;
-            z-index: 30; 
-            background-color: #FFC107; 
-            color: #333; 
-            font-weight: 700;
-            font-size: 0.75em;
-            padding: 4px 8px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        [dir="rtl"] .promo-card .new-badge { right: 10px; left: auto; }
-        [dir="ltr"] .promo-card .new-badge { left: 10px; right: auto; }
-        
-        .promo-card .slider-item {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .promo-card .slider-item.active { opacity: 1; }
-        
-        .promo-card .slider-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-            display: block;
-        }
-        
-        /* ------------------ المربع الثابت (Fixed Offer) ------------------ */
-        .promo-card.fixed-offer {
-             flex: 1 0 140px; 
-             min-width: 140px; 
-             overflow: visible; 
-             border-radius: 10px; 
-        }
-
-        .promo-card.fixed-offer .off-amount {
-            color: #FF0050 !important; 
-            font-size: 1.6em; 
-            white-space: nowrap; 
-            display: inline-block; 
-        }
-        
-        .promo-card.fixed-offer .off-amount span {
-            font-size: 0.7em; 
-            font-weight: bold; 
-            display: inline-block; 
-            vertical-align: top; 
-            margin-top: 5px; 
-            margin-inline-start: 5px; 
-        }
-        
-        .promo-card.fixed-offer .promo-button {
-            padding: 3px 8px !important; 
-            background: #FF0050 !important; 
-            color: white !important; 
-            border-radius: 25px !important; 
-            margin-top: 0px; 
-            text-decoration: none; 
-            font-size: 0.65em; 
-            font-weight: bold;
-            box-shadow: 0 3px 8px rgba(255, 0, 80, 0.6);
-            border: none;
-            transition: all 0.2s; 
-        }
-        
-        .promo-card.fixed-offer > div { 
-            position: absolute !important; 
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 10;
-            display: grid !important; 
-            place-content: center; 
-            align-content: center; 
             text-align: center; 
-            grid-template-rows: min-content min-content; 
-            height: 100%;
-            width: 100%;
-            box-sizing: border-box; 
-            padding: 5px; 
-            border-radius: 10px; 
+            z-index: 10;
         }
         
-        /* ------------------- أزرار المنتج (شراء الآن وعرض الصور) ------------------- */
+        .banner-title {
+            font-size: 2.5em;
+            font-weight: 900;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            margin: 0 0 10px 0;
+        }
+        
+        .banner-subtitle { display: none; }
+        
+        .banner-link-btn {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            padding: 10px 20px; 
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1em; 
+            text-decoration: none;
+            margin-top: 15px; 
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        
+        .banner-link-btn:hover {
+            background-color: #e74c3c; 
+            transform: scale(1.05);
+        }
+
+        /* ------------------- أزرار المنتج ------------------- */
         .product-actions { 
             display: flex; 
-            margin-top: 20px;
-            gap: 10px; 
+            flex-wrap: nowrap; 
+            align-items: center; 
+            gap: 5px; 
+            margin-top: 10px;
         }
         
-        .product-actions .show-images-btn {
-            background-color: #FFC107; 
-            color: #333; 
-            flex-grow: 1; 
-            padding: 8px 15px; 
-            border-radius: 15px; 
-            font-weight: 900; 
-            box-shadow: 0 3px 6px rgba(255, 193, 7, 0.4); 
-            font-size: 0.85em; 
-            border: none; 
-            text-align: center; 
-            text-decoration: none; 
-            display: flex; 
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s; 
-        }
-        
-        .product-actions .show-images-btn span.text-with-underline {
-             text-decoration: underline;
-             text-decoration-thickness: 2px;
-             text-underline-offset: 4px;
-             text-decoration-color: #333; 
-             margin: 0 5px; 
-        }
-        
-        .product-actions .show-images-btn i {
-             text-decoration: none;
-             margin: 0 5px;
-        }
-        
-
-        .product-actions .buy-now-btn {
-             background-color: #FF0050; 
-             color: white; 
-             flex-grow: 1; 
-             padding: 8px 15px; 
-             border-radius: 15px; 
-             font-weight: 900; 
-             text-align: center; 
+        .product-actions a,
+        .product-actions button {
+             padding: 8px 10px; 
+             border-radius: 12px; 
+             font-weight: 700; 
+             font-size: 0.75em; 
              text-decoration: none; 
-             box-shadow: 0 3px 6px rgba(255, 0, 80, 0.5); 
-             font-size: 0.85em; 
-             transition: all 0.2s; 
              display: flex; 
              align-items: center;
              justify-content: center;
+             transition: all 0.2s; 
+             flex-grow: 1; 
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+             min-width: 0; 
+             border: none;
+             cursor: pointer;
         }
         
-        .product-actions .buy-now-btn i { margin: 0 5px; }
+        .product-actions a:hover,
+        .product-actions button:not(.manual-copy-btn):hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .product-actions .buy-now-btn {
+             background-color: var(--primary-color); 
+             color: var(--white-color); 
+             box-shadow: 0 2px 5px rgba(255, 0, 80, 0.4); 
+        }
+        
+        .product-actions .show-images-btn {
+            background-color: var(--secondary-color); 
+            color: var(--dark-color); 
+            box-shadow: 0 2px 5px rgba(255, 193, 7, 0.4); 
+        }
+        
+        .product-actions .share-product-btn-footer {
+            background-color: #000;
+            color: var(--white-color); 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+            flex-grow: 0; 
+            width: 40px; 
+            padding: 8px 0; 
+        }
+
+        .product-actions .buy-now-btn i,
+        .product-actions .show-images-btn i {
+             margin-inline-end: 5px; 
+        }
+        .product-actions .share-product-btn-footer i { margin: 0; }
+        
+        /* ------------------- شريط رابط المنتج العائم (Copy Link Bar) ------------------- */
+        .link-input-container {
+            position: absolute; 
+            bottom: 0; 
+            left: 0;
+            right: 0;
+            z-index: 1000; 
+            background-color: #333; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-radius: 0 0 12px 12px; 
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+            box-sizing: border-box;
+            direction: ltr; 
+            display: none; 
+        }
+
+        .link-input-container .link-input {
+            flex-grow: 1;
+            padding: 6px;
+            margin-inline-end: 10px;
+            border: 1px solid #444; 
+            border-radius: 6px;
+            font-size: 0.8em;
+            color: #fff;
+            background-color: #222;
+            text-align: left; 
+            cursor: text;
+            user-select: all; 
+            overflow-x: auto;
+            white-space: nowrap;
+            outline: none;
+        }
+
+        .link-input-container .manual-copy-btn {
+            background-color: #28a745; 
+            color: var(--white-color);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0; 
+        }
+
+        .link-input-container .manual-copy-btn:hover {
+            background-color: #218838;
+        }
         
         /* ------------------- زر عرض المزيد ------------------- */
         .show-more-page-btn {
-            display: none; 
-            width: 150px; 
+            width: 250px; 
             margin: 30px auto 50px auto; 
-            padding: 8px 15px; 
+            padding: 10px 15px; 
             border: 2px solid #000; 
             border-radius: 25px; 
             background-color: #000; 
@@ -517,135 +798,135 @@
             transition: all 0.3s ease;
             text-align: center;
             text-decoration: none;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .show-more-page-btn:hover:not(.disabled-btn) {
-            background-color: #333; 
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5); 
+            background-color: #333;
             transform: translateY(-2px);
         }
 
         .show-more-page-btn.disabled-btn {
-            background-color: #FFF; 
-            color: #000; 
-            border: 2px solid #000; 
-            cursor: default;
-            opacity: 1;
-            font-weight: 500;
-            box-shadow: none; 
-            padding: 8px 15px;
-            font-size: 0.9em;
+            background-color: #7f8c8d;
+            border-color: #7f8c8d;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.8;
         }
-        
-        [dir="rtl"] .show-more-page-btn i { margin-left: 8px; }
-        [dir="ltr"] .show-more-page-btn i { margin-right: 8px; }
-
-        /* ------------------- استعلام وسائط خاص للهواتف ------------------- */
-        @media (max-width: 600px) {
-             .language-toggle { top: 10px; }
-            
-            [dir="rtl"] .language-toggle { right: 10px; left: auto; }
-            [dir="ltr"] .language-toggle { left: 10px; right: auto; }
-
-            .store-name-container { top: 40px; }
-            [dir="rtl"] .store-name-container { left: 15px; }
-            [dir="ltr"] .store-name-container { right: 15px; }
-            
-            .store-name-banner { font-size: 1.0em; }
-            
-            .rotating-triangle { font-size: 1.2em; }
-            
-            .authorized-agent-text { font-size: 0.6em; margin-top: 10px; }
-
-            .promo-floating-content { padding: 0 20px; }
-            
-            .promo-price-large { font-size: 1.2em; }
-            
-            .promo-floating-content .promo-stars i { font-size: 0.7em; }
-            
-            .promo-action-button .promo-small-btn { padding: 6px 15px; font-size: 0.8em; }
-
-            .promo-cards-container { gap: 5px; padding: 0 20px; width: calc(100% - 40px); }
-        
-            .promo-card { min-width: 45px; height: 100px; }
-            
-            .promo-card .new-badge { font-size: 0.65em; padding: 3px 6px; top: 5px; }
-        
-            .promo-card.fixed-offer { flex: 1 0 75px; min-width: 75px; }
-            
-            .promo-card.fixed-offer .off-amount { font-size: 1em; }
-            
-            .promo-card.fixed-offer .off-amount span { font-size: 0.7em; margin-top: 3px; margin-inline-start: 3px; }
-            
-            .promo-card.fixed-offer .off-text { font-size: 0.5em; }
-
-            .promo-card.fixed-offer .promo-button { padding: 3px 8px !important; font-size: 0.7em; }
-
-            .promo-card.fixed-offer > div { padding: 1px 1px; }
-            
-            .show-more-page-btn, .show-more-page-btn.disabled-btn {
-                width: 130px;
-                padding: 6px 10px;
-                font-size: 0.8em;
-                margin: 20px auto 40px auto; 
-            }
-        }
-        /* ------------------- نهاية استعلام وسائط خاص للهواتف ------------------- */
-
-
     </style>
 </head>
 <body>
     
-    <div class="language-toggle">
-        <button id="toggleLangBtn" onclick="toggleLanguage()">EN / AR</button>
-    </div>
-    
-    <section class="promo-banner-section" id="promoBannerSection">
-        
-        <div class="store-name-container">
-            <div class="store-name-header">
-                <span class="store-name-banner" id="storeNameBanner"></span>
-                <span class="rotating-triangle"></span>
+    <header class="main-header">
+        <h2 class="header-title" id="headerTitle"></h2>
+        <div class="header-controls">
+            <div class="language-toggle">
+                <button id="toggleLangBtn">EN / AR</button> 
             </div>
-            <span class="authorized-agent-text" id="authorizedAgentText"></span>
+             <button class="menu-toggle-btn" id="openMenuBtn" aria-label="Open Menu"><i class="fas fa-bars"></i></button>
         </div>
-        <div class="promo-floating-content">
-            <div class="promo-price-details">
-                <div class="promo-price-large" id="specialProductPrice"></div>
-                <div class="promo-stars" id="specialProductStars"></div>
-            </div>
-            
-            <div class="promo-action-button">
-                <a href="" id="specialProductLink" target="_blank" class="promo-small-btn">
-                    Get new
-                </a>
-            </div>
+    </header>
+
+    <div id="mySidebar" class="sidebar">
+        <span class="sidebar-close-btn" id="closeMenuBtn" aria-label="Close Menu">&times;</span>
+        
+        <div class="sidebar-header">
+            <i class="fas fa-user-circle sidebar-user-icon"></i>
+            <h4 class="sidebar-username" id="sidebarUsername">لوحة تحكم المتجر</h4>
+            <span class="sidebar-status" id="sidebarStatus">وضع الإدارة</span>
         </div>
 
-        <div class="promo-cards-container">
+        <button id="addProductBtn" aria-controls="addProductModal" class="sidebar-action-btn primary-btn"><i class="fas fa-plus-circle"></i> <span id="addProductText">إضافة منتج جديد</span></button>
+        
+        <h4 class="sidebar-title" id="categoriesTitle">تصفح الفئات:</h4>
+        
+        <div class="category-links-container" id="categoryLinksContainer">
+            </div>
+        
+        <button id="contactBtn" aria-controls="contactModal" class="sidebar-action-btn secondary-btn"><i class="fas fa-paper-plane"></i> <span id="contactText">تواصل</span></button>
+    </div>
+
+
+    <div id="contactModal" class="modal" role="dialog" aria-labelledby="contactModalTitle">
+      <div class="modal-content">
+        <span class="close-modal" id="closeContactModalBtn" aria-label="Close Contact Modal">&times;</span> 
+        <h3 id="contactModalTitle">إرسال رسالة تواصل</h3>
+        
+        <form id="contactForm">
+            <label for="contactEmail"><i class="fas fa-envelope"></i> <span id="emailLabelText">بريدك الإلكتروني (لإجابتك):</span></label>
+            <input type="email" id="contactEmail" required placeholder="example@domain.com">
+
+            <label for="contactMessage"><i class="fas fa-comment"></i> <span id="messageLabelText">رسالتك:</span></label>
+            <textarea id="contactMessage" required placeholder="أدخل رسالتك هنا..."></textarea>
             
-            <div class="promo-card fixed-offer transparent-promo-card">
-                <img src="" id="fixedOfferImage" alt="Fixed Product" class="fixed-offer-img" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+            <div style="overflow: auto;">
+                <button type="submit" id="sendMessageBtn" aria-label="Send Message"><span id="sendText">إرسال</span> <i class="fas fa-paper-plane"></i></button>
+            </div>
+            </form>
+      </div>
+    </div>
+
+
+    <div id="addProductModal" class="modal" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-content">
+        <span class="close-modal" id="closeModalBtn" aria-label="Close Add Product Modal">&times;</span>
+        <h3 id="modalTitle">إضافة منتج جديد</h3>
+        
+        <form id="productForm">
+            <label for="productCategory" id="categoryLabelText">الفئة:</label>
+            <select id="productCategory" required>
+                <option value="فساتين">فساتين</option>
+                <option value="جاكيت">جاكيت</option>
+                <option value="بدلة اطفال">بدلة اطفال</option>
+                <option value="احذية">احذية</option>
+                <option value="ساعات">ساعات</option>
+                <option value="اكسسوارات">اكسسوارات</option>
+                <option value="مكياج">مكياج</option>
+                <option value="اخرى">أخرى</option>
+            </select>
+
+            <label for="productNameAr" id="nameArLabelText">اسم المنتج (عربي):</label>
+            <input type="text" id="productNameAr" required>
+            
+            <label for="productSizesAr" id="sizesArLabelText">الألوان والمقاسات (عربي):</label>
+            <input type="text" id="productSizesAr" placeholder="مثال: للأعمار 3-8 سنوات، ألوان متعددة" required>
+
+            <label for="productPrice" id="priceLabelText">السعر (بالدولار $):</label>
+            <input type="number" id="productPrice" step="0.01" min="0.01" required>
+
+            <label for="productImagesLink" id="imagesLinkLabelText">رابط المنتج (زر عرض الصور):</label>
+            <input type="url" id="productImagesLink" required>
+
+            <label for="productLink" id="linkLabelText">رابط المنتج الأساسي (زر شراء الآن):</label>
+            <input type="url" id="productLink" required>
+
+            <label for="productImageUrl" id="imageUrlLabelText">رابط صورة المنتج الرئيسية:</label>
+            <input type="url" id="productImageUrl" required>
+
+            <div class="modal-actions">
+                <button type="submit" id="insertBtn" aria-label="Insert Product"></button>
                 
-                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;">
-                    <div class="off-amount" id="fixedOfferAmount" style="font-size: 1.8em; font-weight: bold; margin-bottom: 5px;"></div>
-                    <div class="off-text" id="fixedOfferText" style="color: #333;"></div>
-                    
-                    <a href="" id="getNowLink" target="_blank" class="promo-button">
-                        Get Now 
-                    </a>
+                <div id="password-container">
+                    <input type="password" id="password-input" placeholder="كلمة المرور لتنفيذ الإدراج" maxlength="8">
                 </div>
             </div>
-            
-            <div class="promo-card" id="promoItem1">
-                </div>
-            
-            <div class="promo-card" id="promoItem2">
-                 </div>
-            
+            </form>
+      </div>
+    </div>
+
+
+    <section class="promo-banner-section" id="promoBannerSection">
+        <div class="moving-box"></div>
+        <div class="moving-box"></div>
+        <div class="moving-box"></div>
+        <div class="moving-box"></div>
+        <div class="banner-content-wrapper">
+            <h1 class="banner-title" id="storeNameBanner"></h1>
+            <a href="#" target="_blank" class="banner-link-btn" id="getNowLink"></a>
         </div>
-        
     </section>
 
     <main class="products-container">
@@ -653,9 +934,10 @@
             </div>
     </main>
     
-    <button class="show-more-page-btn" id="loadMoreBtn" onclick="loadProducts()">
+    <button class="show-more-page-btn" id="loadMoreBtn">
         <i class="fas fa-arrow-down"></i> <span id="loadMoreText">عرض المزيد</span>
     </button>
+    
     
     <script>
         /* ====================================================================================
@@ -665,78 +947,334 @@
         const PRODUCTS_PER_LOAD = 12; 
         
         let storeSettings = {
-            name: 'Walmart Shopping', 
-            faviconUrl: 'https://via.placeholder.com/16x16?text=W',
+            name: 'Express Shopping', 
+            faviconUrl: 'https://via.placeholder.com/16x16?text=ES', // تم تعديل النص
         };
 
         let bannerData = {
-            backgroundUrl: 'https://picsum.photos/1600/400?random=big-special-product', 
-            specialProduct: {
-                price: '$199.99', 
-                rating: 3.5, 
-                link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20special%20deal' 
-            },
-            fixedOffer: {
-                imageUrl: 'https://picsum.photos/300/300?random=fixed-offer-img', 
-                amount_ar: '$390 <span>خصم</span>', 
-                amount_en: '$390 <span>OFF</span>', 
-                text_ar: 'على كوبونات الخصم', 
-                text_en: 'in coupon codes', 
-                link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20this%20offer' 
-            },
-            item1: [ 
-                { url: 'https://picsum.photos/800/800?random=shoe', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20shoe' }, 
-                { url: 'https://picsum.photos/800/800?random=perfume', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20perfume' }, 
-                { url: 'https://picsum.photos/800/800?random=earring', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20earring' }, 
-            ],
-            item2: [ 
-                { url: 'https://picsum.photos/800/800?random=lipstick', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20lipstick' }, 
-                { url: 'https://picsum.photos/800/800?random=patch', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20patch' }, 
-                { url: 'https://picsum.photos/800/800?random=brush', link: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20the%20brush' }, 
-            ]
+            backgroundUrl: 'https://i.imgur.com/JhzXfJp.jpeg', 
+            link: 'https://s.click.aliexpress.com/e/_EvD4eBi' 
         };
 
-        let productsData = [
-          { id: 101, name_ar: 'فستان نسائي أنيق وراقي', name_en: 'Elegant Women Dress', code: 'F7RR', price: 24.90, rating: 4.9, soldCount: 125000, likesCount: 1250, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20فستان%20F7RR', link_en: 'https://s.click.aliexpress.com/e/_ExmCilS', sizes_ar: 'S, M, L, XL', sizes_en: 'S, M, L, XL', badgeYellow_ar: 'Choice', badgeYellow_en: 'Choice', badgeBlack_ar: 'Black Friday', badgeBlack_en: 'Black Friday', images: ['https://i.imgur.com/YaiMb4S.jpeg'] }, 
-          { id: 102, name_ar: 'جاكيت جينز عصري', name_en: 'Modern Denim Jacket', code: 'J8KK', price: 35.50, rating: 4.5, soldCount: 20000, likesCount: 300, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20جاكيت%20J8KK', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20J8KK', sizes_ar: 'M, L', sizes_en: 'M, L', badgeYellow_ar: 'جديد', badgeYellow_en: 'New', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1011/800/800'] },
-          { id: 103, name_ar: 'ساعة يد رقمية فاخرة', name_en: 'Luxury Digital Watch', code: 'W900', price: 120.00, rating: 4.8, soldCount: 5000, likesCount: 950, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20ساعة%20W900', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20W900', sizes_ar: 'متاح', sizes_en: 'Available', badgeYellow_ar: 'عرض خاص', badgeYellow_en: 'Special Offer', badgeBlack_ar: 'توصيل مجاني', badgeBlack_en: 'Free Shipping', images: ['https://picsum.photos/id/10/800/800'] },
-          { id: 104, name_ar: 'حقيبة ظهر رياضية', name_en: 'Sports Backpack', code: 'B4P', price: 45.99, rating: 4.2, soldCount: 15000, likesCount: 600, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20حقيبة%20B4P', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20B4P', sizes_ar: 'كبير', sizes_en: 'Large', badgeYellow_ar: 'الأكثر مبيعًا', badgeYellow_en: 'Bestseller', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1015/800/800'] },
-          { id: 105, name_ar: 'حذاء رياضي مريح للجري', name_en: 'Comfortable Running Shoes', code: 'SH01', price: 89.99, rating: 4.6, soldCount: 7500, likesCount: 450, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20حذاء%20SH01', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20SH01', sizes_ar: '40, 41, 42, 43', sizes_en: '40, 41, 42, 43', badgeYellow_ar: 'New Arrival', badgeYellow_en: 'New Arrival', badgeBlack_ar: 'خصم', badgeBlack_en: 'Discount', images: ['https://picsum.photos/id/1023/800/800'] },
-          { id: 106, name_ar: 'مجموعة مكياج فاخرة كاملة', name_en: 'Luxury Full Makeup Set', code: 'MK02', price: 150.00, rating: 4.9, soldCount: 2000, likesCount: 800, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20مجموعة%20MK02', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20MK02', sizes_ar: 'ألوان متعددة', sizes_en: 'Multi Colors', badgeYellow_ar: 'Exclusive', badgeYellow_en: 'Exclusive', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1024/800/800'] },
-          { id: 107, name_ar: 'سماعات بلوتوث لاسلكية', name_en: 'Wireless Bluetooth Headphones', code: 'HP03', price: 59.00, rating: 4.7, soldCount: 30000, likesCount: 1500, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20سماعات%20HP03', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20HP03', sizes_ar: 'أبيض, أسود', sizes_en: 'White, Black', badgeYellow_ar: 'توصيل سريع', badgeYellow_en: 'Fast Shipping', badgeBlack_ar: 'Top Rated', badgeBlack_en: 'Top Rated', images: ['https://picsum.photos/id/1036/800/800'] },
-          { id: 108, name_ar: 'قميص صيفي قطني رجالي', name_en: 'Men\'s Summer Cotton Shirt', code: 'CS04', price: 29.99, rating: 4.4, soldCount: 18000, likesCount: 250, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20قميص%20CS04', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20CS04', sizes_ar: 'M, L, XL, XXL', sizes_en: 'M, L, XL, XXL', badgeYellow_ar: '', badgeYellow_en: '', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1040/800/800'] },
-          { id: 109, name_ar: 'إكسسوار سيارة متعدد الوظائف', name_en: 'Multi-function Car Accessory', code: 'AC05', price: 19.50, rating: 4.1, soldCount: 5000, likesCount: 100, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20إكسسوار%20AC05', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20AC05', sizes_ar: 'حجم واحد', sizes_en: 'One Size', badgeYellow_ar: 'الأقل سعراً', badgeYellow_en: 'Lowest Price', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1041/800/800'] },
-          { id: 110, name_ar: 'فستان سهرة طويل للنساء', name_en: 'Long Evening Dress for Women', code: 'DR06', price: 99.00, rating: 4.7, soldCount: 1200, likesCount: 700, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20فستان%20DR06', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20DR06', sizes_ar: 'S, M, L', sizes_en: 'S, M, L', badgeYellow_ar: 'عرض نهاية الأسبوع', badgeYellow_en: 'Weekend Offer', badgeBlack_ar: 'جديد', badgeBlack_en: 'New', images: ['https://picsum.photos/id/1047/800/800'] },
-          { id: 111, name_ar: 'كاميرا تصوير احترافية', name_en: 'Professional Camera', code: 'CM07', price: 450.00, rating: 5.0, soldCount: 500, likesCount: 300, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20كاميرا%20CM07', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20CM07', sizes_ar: 'أسود', sizes_en: 'Black', badgeYellow_ar: 'Choice', badgeYellow_en: 'Choice', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1050/800/800'] },
-          { id: 112, name_ar: 'سروال جينز ضيق نسائي', name_en: 'Women\'s Skinny Jeans', code: 'JN08', price: 39.99, rating: 4.3, soldCount: 9000, likesCount: 200, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20سروال%20JN08', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20JN08', sizes_ar: '30, 32, 34', sizes_en: '30, 32, 34', badgeYellow_ar: '', badgeYellow_en: '', badgeBlack_ar: 'تخفيض', badgeBlack_en: 'Sale', images: ['https://picsum.photos/id/1051/800/800'] },
-          
-          /* تكرار المنتجات لضمان عمل زر "عرض المزيد" (المنتجات 13-18) */
-          { id: 113, name_ar: 'عطر رجالي يدوم طويلاً', name_en: 'Long Lasting Men\'s Perfume', code: 'PR09', price: 65.00, rating: 4.9, soldCount: 1500, likesCount: 650, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20عطر%20PR09', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20PR09', sizes_ar: 'حجم 100 مل', sizes_en: '100ml Size', badgeYellow_ar: 'هدايا مجانية', badgeYellow_en: 'Free Gifts', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1054/800/800'] },
-          { id: 114, name_ar: 'منظم مكتبي خشبي أنيق', name_en: 'Elegant Wooden Desk Organizer', code: 'OR10', price: 32.75, rating: 4.5, soldCount: 4000, likesCount: 150, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20منظم%20OR10', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20OR10', sizes_ar: 'بني فاتح', sizes_en: 'Light Brown', badgeYellow_ar: 'جديد', badgeYellow_en: 'New', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1058/800/800'] },
-          { id: 115, name_ar: 'حذاء رياضي مريح للجري', name_en: 'Comfortable Running Shoes', code: 'SH01-B', price: 89.99, rating: 4.6, soldCount: 7500, likesCount: 450, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20حذاء%20SH01-B', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20SH01-B', sizes_ar: '40, 41, 42, 43', sizes_en: '40, 41, 42, 43', badgeYellow_ar: 'New Arrival', badgeYellow_en: 'New Arrival', badgeBlack_ar: 'خصم', badgeBlack_en: 'Discount', images: ['https://picsum.photos/id/1062/800/800'] },
-          { id: 116, name_ar: 'مجموعة مكياج فاخرة كاملة', name_en: 'Luxury Full Makeup Set', code: 'MK02-B', price: 150.00, rating: 4.9, soldCount: 2000, likesCount: 800, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20مجموعة%20MK02-B', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20MK02-B', sizes_ar: 'ألوان متعددة', sizes_en: 'Multi Colors', badgeYellow_ar: 'Exclusive', badgeYellow_en: 'Exclusive', badgeBlack_ar: '', badgeBlack_en: '', images: ['https://picsum.photos/id/1066/800/800'] },
-          { id: 117, name_ar: 'سماعات بلوتوث لاسلكية', name_en: 'Wireless Bluetooth Headphones', code: 'HP03-B', price: 59.00, rating: 4.7, soldCount: 30000, likesCount: 1500, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20سماعات%20HP03-B', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20HP03-B', sizes_ar: 'أبيض, أسود', sizes_en: 'White, Black', badgeYellow_ar: 'توصيل سريع', badgeYellow_en: 'Fast Shipping', badgeBlack_ar: 'Top Rated', badgeBlack_en: 'Top Rated', images: ['https://picsum.photos/id/1067/800/800'] },
-          { id: 118, name_ar: 'قميص صيفي قطني رجالي', name_en: 'Men\'s Summer Cotton Shirt', code: 'CS04-B', price: 29.99, rating: 4.4, soldCount: 18000, likesCount: 250, link_ar: 'https://wa.me/966500000000?text=أرغب%20في%20شراء%20قميص%20CS04-B', link_en: 'https://wa.me/966500000000?text=I%20want%20to%20buy%20CS04-B', sizes_ar: 'M, L, XL, XXL', sizes_en: 'M, L, XL, XXL', badgeYellow_ar: 'مخفض', badgeYellow_en: 'Reduced', badgeBlack_ar: 'صيفي', badgeBlack_en: 'Summer', images: ['https://picsum.photos/id/1068/800/800'] },
-        ];
+        // 🟢 تعريف الفئات (Categories) التي تم إضافتها في الواجهة (عربي)
+        const CATEGORIES_AR = {
+            'all': 'جميع المنتجات',
+            'فساتين': 'فساتين',
+            'جاكيت': 'جاكيت',
+            'بدلة اطفال': 'بدلة أطفال',
+            'احذية': 'أحذية',
+            'ساعات': 'ساعات',
+            'اكسسوارات': 'إكسسوارات',
+            'مكياج': 'مكياج',
+            'اخرى': 'أخرى'
+        };
 
+        // 🟢 تعريف الفئات (Categories) التي تم إضافتها في الواجهة (إنجليزي)
+        const CATEGORIES_EN = {
+            'all': 'All Products',
+            'فساتين': 'Dresses',
+            'جاكيت': 'Jacket',
+            'بدلة اطفال': 'Kids Suit',
+            'احذية': 'Shoes',
+            'ساعات': 'Watches',
+            'اكسسوارات': 'Accessories',
+            'مكياج': 'Makeup',
+            'اخرى': 'Others'
+        };
+        
+        const CORRECT_PASSWORD = '40044004'; // 🔑 كلمة المرور المطلوبة
+        const CONTACT_EMAIL = 'wiom9447@gmail.com'; // 📧 بريدك الإلكتروني المستهدف (مشفر/مخفي في الكود)
+
+
+        // 👈 **بيانات المنتجات** (تم الاحتفاظ بها كما هي)
+        let productsData = [
+{ 
+    id: 129, category: 'بدلة اطفال',
+    name_ar: 'طقم ملابس أولاد شتوي دافئ (هودي وبنطال جينز)', 
+    name_en: 'Boys Warm Winter Set (Hoodie and Jeans)', 
+    code: 'BHST3', 
+    price: 12.20, 
+    rating: 4.6, 
+    soldCount: 11000, 
+    likesCount: 1500, 
+    isLiked: false, 
+    link_ar: 'https://s.click.aliexpress.com/e/_EyIKaaG', 
+    link_en: 'https://s.click.aliexpress.com/e/_EyIKaaG', 
+    sizes_ar: 'للعمر: 4 - 10 سنوات', 
+    sizes_en: 'Ages: 4 - 10 Years', 
+    badgeYellow_ar: 'شحن مجاني', 
+    badgeYellow_en: 'Free Shipping', 
+    badgeBlack_ar: 'جودة قطنية', 
+    badgeBlack_en: 'Cotton Quality', 
+    images: ['https://i.imgur.com/dhNWmlB.jpeg'] 
+},
+{ 
+    id: 130, category: 'فساتين',
+    name_ar: 'فستان حفلات بناتي مستوحى من فساتين الأميرات', 
+    name_en: 'Princess Inspired Girls Party Dress', 
+    code: 'PRDRS', 
+    price: 28.57, 
+    rating: 4.9, 
+    soldCount: 25000, 
+    likesCount: 4200, 
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_EyajuQM', 
+    link_en: 'https://s.click.aliexpress.com/e/_EyajuQM', 
+    sizes_ar: 'للعمر: 5 - 9 سنوات', 
+    sizes_en: 'Ages: 5 - 9 Years', 
+    badgeYellow_ar: 'الأكثر مبيعاً', 
+    badgeYellow_en: 'Bestseller', 
+    badgeBlack_ar: 'عرض محدود', 
+    badgeBlack_en: 'Limited Offer', 
+    images: ['https://i.imgur.com/nWcGYVq.jpeg'] 
+},
+{ 
+    id: 131, category: 'احذية',
+    name_ar: 'حذاء رياضي عصري للأطفال بنظام إغلاق سهل (Velcro)', 
+    name_en: 'Trendy Kids Sport Shoes with Easy Closure (Velcro)', 
+    code: 'KSHOE', 
+    price: 7.26, 
+    rating: 4.7, 
+    soldCount: 18000, 
+    likesCount: 2100, 
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_Ez7L3Io', 
+    link_en: 'https://s.click.aliexpress.com/e/_Ez7L3Io', 
+    sizes_ar: 'المقاسات: 25 - 34', 
+    sizes_en: 'Sizes: 25 - 34', 
+    badgeYellow_ar: 'Choice', 
+    badgeYellow_en: 'Choice', 
+    badgeBlack_ar: 'مريح جداً', 
+    badgeBlack_en: 'Very Comfortable', 
+    images: ['https://i.imgur.com/YbyQpLs.jpeg'] 
+},
+{ 
+    id: 132, category: 'جاكيت',
+    name_ar: 'جاكيت بناتي خريفي خفيف مع غطاء للرأس', 
+    name_en: 'Girls Lightweight Autumn Jacket with Hood', 
+    code: 'GJKT2', 
+    price: 5.57, 
+    rating: 4.5, 
+    soldCount: 8800, 
+    likesCount: 1450, 
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_EylKBFi', 
+    link_en: 'https://s.click.aliexpress.com/e/_EylKBFi', 
+    sizes_ar: 'للعمر: 3 - 8 سنوات', 
+    sizes_en: 'Ages: 3 - 8 Years', 
+    badgeYellow_ar: 'عرض محدود', 
+    badgeYellow_en: 'Limited Offer', 
+    badgeBlack_ar: 'ألوان جذابة', 
+    badgeBlack_en: 'Attractive Colors', 
+    images: ['https://i.imgur.com/v9xUpZo.jpeg'] 
+},
+{ 
+    id: 139, category: 'ساعات',
+    name_ar: 'ساعة يد رقمية عصرية للبنات مقاومة للماء مع أضواء LED', 
+    name_en: 'Trendy Digital Wrist Watch for Girls, Waterproof with LED Lights', 
+    code: 'GWDG1', 
+    price: 29.53, 
+    rating: 4.7, 
+    soldCount: 12500, 
+    likesCount: 2300, 
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_EyZ082k', 
+    link_en: 'https://s.click.aliexpress.com/e/_EyZ082k', 
+    sizes_ar: 'لون وردي، بنفسجي، أزرق، ذهبي', 
+    sizes_en: 'Pink, Purple, Blue Color', 
+    badgeYellow_ar: 'الأكثر مبيعاً', 
+    badgeYellow_en: 'Bestseller', 
+    badgeBlack_ar: 'شحن مجاني', 
+    badgeBlack_en: 'Free Shipping', 
+    images: ['https://i.imgur.com/6CXrUba.jpeg'] 
+},
+{ 
+    id: 140, category: 'بدلة اطفال',
+    name_ar: 'بدلة بناتي شتوية 3 قطع دافئة (جاكيت، كنزة، وبنطال)', 
+    name_en: 'Girls Warm Winter Suit 3-Piece (Jacket, Sweater, and Pants)', 
+    code: 'GWST3', 
+    price: 10.88, 
+    rating: 4.8, 
+    soldCount: 9200, 
+    likesCount: 1700, 
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_EvAfNFa', 
+    link_en: 'https://s.click.aliexpress.com/e/_EvAfNFa', 
+    sizes_ar: 'للعمر: 2 - 5 سنوات (متوفرة بألوان متعددة)', 
+    sizes_en: 'Ages: 2 - 5 Years (Available in Multi Colors)', 
+    badgeYellow_ar: 'جودة فاخرة', 
+    badgeYellow_en: 'Premium Quality', 
+    badgeBlack_ar: 'الأكثر مبيعاً', 
+    badgeBlack_en: 'Bestseller', 
+    images: ['https://i.imgur.com/Hg58KUM.jpeg'] 
+},
+{ 
+    id: 146, category: 'جاكيت',
+    name_ar: 'جاكيت نسائي شتوي فاخر طويل مبطن من الفرو الصناعي', 
+    name_en: 'Luxury Long Winter Women\'s Padded Faux Fur Jacket', 
+    code: 'LWJKT', 
+    price: 42.71, 
+    rating: 4.9, 
+    soldCount: 5100, 
+    likesCount: 2800, 
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_EucHv08', 
+    link_en: 'https://s.click.aliexpress.com/e/_EucHv08', 
+    sizes_ar: 'المقاسات: S, M, L, XL (ألوان: وردي، بنفسجي)', 
+    sizes_en: 'Sizes: S, M, L, XL (Colors: Pink, Purple)', 
+    badgeYellow_ar: 'جودة فائقة', 
+    badgeYellow_en: 'Superior Quality', 
+    badgeBlack_ar: 'تصميم فاخر', 
+    badgeBlack_en: 'Luxury Design', 
+    images: ['https://i.imgur.com/5tsGh1X.jpeg'] 
+},
+{ 
+    id: 150, category: 'اكسسوارات',
+    name_ar: 'شنطة يد وكتف نسائية راقية من الجلد النباتي بمقبض ذهبي', 
+    name_en: 'Luxury Women\'s Hand/Shoulder Bag in Vegan Leather with Gold Handle', 
+    code: 'LHBAG', 
+    price: 8.22, 
+    rating: 4.7, 
+    soldCount: 9300, 
+    likesCount: 2500, 
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_EyTd2RW', 
+    link_en: 'https://s.click.aliexpress.com/e/_EyTd2RW', 
+    sizes_ar: 'مقاس موحد (ألوان: أسود، أبيض، بنفسجي، رمادي)', 
+    sizes_en: 'One Size (Colors: Black, White, Purple, Gray)', 
+    badgeYellow_ar: 'تصميم أوروبي', 
+    badgeYellow_en: 'European Design', 
+    badgeBlack_ar: 'جودة ممتازة', 
+    badgeBlack_en: 'Excellent Quality', 
+    images: ['https://i.imgur.com/I9uKqv8.jpeg'] 
+},
+{ 
+    id: 151, category: 'مكياج',
+    name_ar: 'مُلمّع شفاه سائل مرطب بتركيبة غير لزجة وعدة ألوان', 
+    name_en: 'Moisturizing Liquid Lip Gloss with Non-Sticky Formula and Multiple Shades', 
+    code: 'LPGLS', 
+    price: 4.56, 
+    rating: 4.6, 
+    soldCount: 22000, 
+    likesCount: 4100, 
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_Eyx7fRS', 
+    link_en: 'https://s.click.aliexpress.com/e/_Eyx7fRS', 
+    sizes_ar: 'الظلال: وردي فاتح، خوخي، شفاف (متعدد الألوان)', 
+    sizes_en: 'Shades: Light Pink, Peach, Clear (Multi-Color Options)', 
+    badgeYellow_ar: 'الأكثر مبيعاً', 
+    badgeYellow_en: 'Bestseller', 
+    badgeBlack_ar: 'ترطيب عميق', 
+    badgeBlack_en: 'Deep Hydration', 
+    images: ['https://i.imgur.com/2TUpDP6.jpeg'] 
+},
+{ 
+    id: 152, category: 'ساعات',
+    name_ar: 'ساعة يد نسائية فاخرة مقاومة للماء مع سوار شبكي أنيق', 
+    name_en: 'Luxury Waterproof Women\'s Wrist Watch with Elegant Mesh Strap', 
+    code: 'LWWAT2', 
+    price: 36.00, 
+    rating: 4.9, 
+    soldCount: 6800, 
+    likesCount: 2900, 
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_Ex82PsM', 
+    link_en: 'https://s.click.aliexpress.com/e/_Ex82PsM', 
+    sizes_ar: 'لون ذهبي، وردي، فضي (مقاس موحد)', 
+    sizes_en: 'Gold, Rose Gold, Silver Color (One Size)', 
+    badgeYellow_ar: 'جودة فائقة', 
+    badgeYellow_en: 'Superior Quality', 
+    badgeBlack_ar: 'تصميم راقي', 
+    badgeBlack_en: 'Elegant Design', 
+    images: ['https://i.imgur.com/iwFLbnj.jpeg'] 
+},
+{ 
+    id: 153, category: 'ساعات',
+    name_ar: 'طقم ساعة يد نسائية فاخرة مرصعة بالماس مع سوار وسلسلة متطابقة', 
+    name_en: 'Luxury Women\'s Diamond Watch Set with Matching Bracelet and Necklace', 
+    code: 'LWSLT', 
+    price: 59.00, 
+    rating: 4.9, 
+    soldCount: 4500, 
+    likesCount: 3500,
+    isLiked: false,
+    link_ar: 'https://s.click.aliexpress.com/e/_EQ5C20o', 
+    link_en: 'https://s.click.aliexpress.com/e/_EQ5C20o', 
+    sizes_ar: 'طقم كامل (ألوان: ذهبي، وردي، فضي)', 
+    sizes_en: 'Complete Set (Colors: Gold, Rose Gold, Silver)', 
+    badgeYellow_ar: 'جودة مجوهرات', 
+    badgeYellow_en: 'Jewelry Quality', 
+    badgeBlack_ar: 'إصدار محدود', 
+    badgeBlack_en: 'Limited Edition', 
+    images: ['https://i.imgur.com/YxrskUX.jpeg'] 
+},
+{ 
+    id: 158, category: 'مكياج',
+    name_ar: 'أحمر شفاه سائل مخملي مطفي (Matte) مقاوم للماء والتلطخ', 
+    name_en: 'Velvet Matte Liquid Lipstick, Waterproof and Smudge-Proof', 
+    code: 'VMLST', 
+    price: 4.46, 
+    rating: 4.8, 
+    soldCount: 38000, 
+    likesCount: 6500, 
+    link_ar: 'https://s.click.aliexpress.com/e/_EQO01Cg', 
+    link_en: 'https://s.click.aliexpress.com/e/_EQO01Cg', 
+    sizes_ar: 'ألوان: أحمر توتي، نيود، بني محمر (متعدد الظلال)', 
+    sizes_en: 'Shades: Berry Red, Nude, Brownish Red (Multi Shades)', 
+    badgeYellow_ar: 'ثبات 24 ساعة', 
+    badgeYellow_en: '24H Stay', 
+    badgeBlack_ar: 'الأكثر مبيعاً', 
+    badgeBlack_en: 'Bestseller', 
+    images: ['https://i.imgur.com/A5mqyt4.jpeg'] 
+},
+{ 
+    id: 161, category: 'اكسسوارات',
+    name_ar: 'أقراط متدلية مربعة فريدة من الزركون البني، أنيقة ورائعة للحفلات', 
+    name_en: 'Unique Square Drop Earrings with Brown Zircon, Elegant and Gorgeous for Parties', 
+    code: 'EASQZ', 
+    price: 1.33, 
+    rating: 4.9, 
+    soldCount: 8800, 
+    likesCount: 3100, 
+    link_ar: 'https://s.click.aliexpress.com/e/_EzHIhfm', 
+    link_en: 'https://s.click.aliexpress.com/e/_EzHIhfm', 
+    sizes_ar: 'مقاس واحد (لون زركون بني فاخر)', 
+    sizes_en: 'One Size (Luxury Brown Zircon Color)', 
+    badgeYellow_ar: 'تصميم فريد', 
+    badgeYellow_en: 'Unique Design', 
+    badgeBlack_ar: 'مناسبة للحفلات', 
+    badgeBlack_en: 'Party Perfect', 
+    images: ['https://i.imgur.com/Bc9nv5M.jpeg'] 
+}
+        ];
+        
         /* ====================================================================================
-           *** 💡 منطقة وظائف العمليات - لا تحتاج للتعديل هنا 💡 ***
+           *** 💡 منطقة وظائف العمليات والتحسينات الجديدة 💡 ***
            ==================================================================================== */
 
         let currentLang = 'ar'; 
         let currentProductIndex = 0; 
-        
-        let promoCardIndex1 = 0;
-        let promoCardIndex2 = 0;
-        let slideshowIntervals = {}; 
+        let currentCategory = 'all'; 
+        let filteredProducts = [];
+        let nextProductId = Math.max(...productsData.map(p => p.id)) + 1; 
 
-        // ------------------ وظائف مساعدة ------------------
+        // 🟢 متغير جديد لتتبع حالة التحقق من كلمة المرور
+        let isPasswordCorrect = false;
+        
+        // ------------------ وظائف مساعدة عامة ------------------
 
         function formatCount(num) {
-            if (num >= 1000) {
-                return (num / 1000).toFixed(1) + (currentLang === 'ar' ? ' ألف' : 'K');
+            try {
+                return new Intl.NumberFormat(currentLang === 'ar' ? 'ar' : 'en', {
+                    notation: 'compact',
+                    maximumFractionDigits: 1
+                }).format(num);
+            } catch (e) {
+                if (num >= 1000) {
+                    return (num / 1000).toFixed(1) + (currentLang === 'ar' ? 'أ' : 'k'); 
+                }
+                return num;
             }
-            return num;
         }
 
         function generateStars(rating) {
@@ -754,26 +1292,365 @@
             }
             return starsHtml;
         }
+        
+        // ------------------ وظائف إدارة اللغة ------------------
+        
+        // 🟢 تحديث نصوص حقول الإضافة/التواصل
+        function updateModalLabels() {
+            const labels = {
+                // Modal الإضافة
+                categoryLabelText: { ar: 'الفئة:', en: 'Category:' },
+                nameArLabelText: { ar: 'اسم المنتج:', en: 'Product Name:' },
+                sizesArLabelText: { ar: 'الألوان والمقاسات:', en: 'Colors and Sizes:' },
+                priceLabelText: { ar: 'السعر (بالدولار $):', en: 'Price (in $):' },
+                imagesLinkLabelText: { ar: 'رابط الصور (زر عرض الصور):', en: 'Images Link (View Images button):' },
+                linkLabelText: { ar: 'رابط الشراء (زر شراء الآن):', en: 'Purchase Link (Buy Now button):' },
+                imageUrlLabelText: { ar: 'رابط صورة المنتج الرئيسية:', en: 'Main Product Image URL:' },
+                
+                // Placeholder
+                 productSizesAr: { ar: 'مثال: للأعمار 3-8 سنوات، ألوان متعددة', en: 'Example: Ages 3-8, Multi Colors' },
+                 passwordInput: { ar: 'كلمة المرور لتنفيذ الإدراج', en: 'Enter Password to Insert' },
+                 
+                 // Modal التواصل
+                 contactText: { ar: 'تواصل', en: 'Contact' },
+                 contactModalTitle: { ar: 'إرسال رسالة تواصل', en: 'Send Contact Message' },
+                 emailLabelText: { ar: 'بريدك الإلكتروني (لإجابتك):', en: 'Your Email (for our reply):' },
+                 messageLabelText: { ar: 'رسالتك:', en: 'Your Message:' },
+                 contactMessage: { ar: 'أدخل رسالتك هنا...', en: 'Enter your message here...' },
+                 sendText: { ar: 'إرسال', en: 'Send' }
+            };
+
+            for (const id in labels) {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = labels[id][currentLang];
+                    } else if (element.tagName === 'LABEL' || element.tagName === 'SPAN' || element.tagName === 'BUTTON' || element.tagName === 'H3') {
+                        element.textContent = labels[id][currentLang];
+                    }
+                }
+            }
+        }
+        
+        function updateStaticBannerContent() {
+            // تحديث البانر
+            document.getElementById('promoBannerSection').style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('${bannerData.backgroundUrl}')`;
+            document.getElementById('storeNameBanner').textContent = storeSettings.name;
+            document.getElementById('storeTitle').textContent = storeSettings.name;
+            document.getElementById('headerTitle').textContent = storeSettings.name; 
+            document.getElementById('getNowLink').href = bannerData.link;
+            document.getElementById('getNowLink').textContent = currentLang === 'ar' ? 'احصل الآن' : 'Get Now';
+
+            // تحديث نصوص القائمة الجانبية ورأس الـ Modal
+            document.getElementById('addProductText').textContent = currentLang === 'ar' ? 'إضافة منتج جديد' : 'Add New Product';
+            document.getElementById('categoriesTitle').textContent = currentLang === 'ar' ? 'تصفح الفئات:' : 'Browse Categories:';
+            document.getElementById('modalTitle').textContent = currentLang === 'ar' ? 'إضافة منتج جديد' : 'Add New Product';
+            
+            // 💡 جديد: تحديث نصوص شريط الـ Sidebar العلوي
+            document.getElementById('sidebarUsername').textContent = currentLang === 'ar' ? 'لوحة تحكم المتجر' : 'Store Control Panel';
+            document.getElementById('sidebarStatus').textContent = currentLang === 'ar' ? 'وضع الإدارة' : 'Admin Mode';
+            document.getElementById('contactText').textContent = currentLang === 'ar' ? 'تواصل' : 'Contact';
+            
+            // تحديث نصوص الأزرار في الـ Modal
+            resetInsertButtonState();
+             
+             // تحديث نصوص الـ Modal
+             updateModalLabels();
+
+             // تحديث أيقونة الفافيكون
+             document.getElementById('favicon').href = storeSettings.faviconUrl;
+        }
+        
+        // 💡 وظيفة جديدة: إنشاء الروابط ديناميكياً
+        function createCategoryLinks() {
+            const container = document.getElementById('categoryLinksContainer');
+            container.innerHTML = ''; // تنظيف الحاوية
+            
+            const categoriesMap = currentLang === 'ar' ? CATEGORIES_AR : CATEGORIES_EN;
+            const allCategories = { ...categoriesMap }; 
+
+            for (const key in allCategories) {
+                const link = document.createElement('a');
+                link.href = "#";
+                link.className = 'category-link';
+                link.setAttribute('data-category', key);
+                link.textContent = allCategories[key];
+
+                link.addEventListener('click', function(e) {
+                     e.preventDefault();
+                     filterProducts(this.getAttribute('data-category'));
+                });
+                
+                // تعيين الفئة النشطة بشكل صحيح عند الإنشاء
+                if (key === currentCategory) {
+                    link.classList.add('active-category');
+                }
+
+                container.appendChild(link);
+            }
+        }
+        
+        function setLanguageAndReload(lang) {
+             currentLang = lang; 
+             const dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+             
+             document.documentElement.lang = currentLang;
+             document.documentElement.dir = dir;
+             
+             document.getElementById('toggleLangBtn').textContent = currentLang === 'ar' ? 'EN' : 'AR';
+             
+             updateStaticBannerContent();
+
+             // 💡 تحديث وإعادة بناء الروابط عند تغيير اللغة
+             createCategoryLinks(); 
+             
+             // 🟢 التأكد من تحديث القائمة النشطة عند تغيير اللغة
+             filterProducts(currentCategory, false); 
+             
+             localStorage.setItem('siteLang', currentLang);
+        }
+        
+        function toggleLanguage() {
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            setLanguageAndReload(newLang);
+        }
+        
+        // ------------------ وظائف القائمة الجانبية (Sidebar) ------------------
+
+        function openNav() {
+            document.getElementById("mySidebar").style.width = "250px";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+        }
+
+        // ------------------ وظيفة فلترة المنتجات حسب الفئة (مُعدلة) ------------------
+        function filterProducts(category, closeSidebar = true) {
+            currentCategory = category;
+            
+            // 💡 تحديث الفئة النشطة عبر إعادة بناء الروابط
+            createCategoryLinks(); 
+            
+            if (category === 'all') {
+                filteredProducts = productsData;
+            } else {
+                filteredProducts = productsData.filter(p => p.category === category);
+            }
+            
+            loadProducts(true);
+            if(closeSidebar) {
+                closeNav(); 
+            }
+        }
+
+        // ------------------ وظيفة الإعجاب ------------------
+        function toggleLike(productId) {
+            const product = productsData.find(p => p.id === productId);
+            const card = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+            if (!product || !card) return;
+
+            // استخدام localStorage لتخزين حالة الإعجاب وعدد الإعجابات المعدل
+            let isLikedState = localStorage.getItem(`product_like_${productId}`) === 'true';
+            let likesCountState = parseInt(localStorage.getItem(`product_likes_count_${productId}`)) || product.likesCount;
+
+            isLikedState = !isLikedState;
+            
+            if (isLikedState) {
+                likesCountState += 1; 
+            } else {
+                // التأكد من أن العدد لا يقل عن صفر
+                likesCountState = Math.max(0, likesCountState - 1); 
+            }
+
+            product.isLiked = isLikedState;
+            product.likesCount = likesCountState;
+
+
+            const likeBtn = card.querySelector('.like-container .like-btn');
+            const likeCount = card.querySelector('.like-container .like-count');
+
+            if (isLikedState) {
+                likeBtn.classList.add('liked', 'fas');
+                likeBtn.classList.remove('far');
+            } else {
+                likeBtn.classList.remove('liked', 'fas');
+                likeBtn.classList.add('far');
+            }
+            
+            likeCount.textContent = formatCount(likesCountState);
+
+            localStorage.setItem(`product_like_${productId}`, isLikedState ? 'true' : 'false');
+            // تحديث قيمة العدد المخزنة
+            localStorage.setItem(`product_likes_count_${productId}`, likesCountState.toString());
+        }
+
+        // ------------------ وظائف النسخ والمشاركة ------------------
+
+        function hideAllLinkInputs() {
+            document.querySelectorAll('.link-input-container').forEach(container => {
+                container.style.display = 'none';
+            });
+        }
+        
+        // إخفاء حقل الإدخال عند النقر خارج البطاقة (محدثة)
+        function handleGlobalClick(event) {
+            const isShareButton = event.target.closest('.share-product-btn-footer');
+            const isLinkInput = event.target.closest('.link-input-container');
+            const isSidebar = event.target.closest('.sidebar');
+            const isModal = event.target.closest('.modal-content');
+            
+            // إخفاء الشريط العائم فقط إذا لم يكن النقر على زر المشاركة أو الشريط نفسه أو داخل Sidebar/Modal
+            if (!isShareButton && !isLinkInput && !isSidebar && !isModal) {
+                hideAllLinkInputs();
+            }
+        }
+        
+        async function manualCopy(productId) {
+            const card = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+            const inputField = card.querySelector('.link-input');
+            
+            if (!inputField) return false;
+
+            const textToCopy = inputField.value; 
+            const inputContainer = card.querySelector('.link-input-container');
+            const copyBtn = inputContainer.querySelector('.manual-copy-btn');
+            const successText = currentLang === 'ar' ? 'تم النسخ!' : 'Copied!';
+            const defaultText = currentLang === 'ar' ? 'نسخ' : 'Copy';
+
+            let copiedSuccessfully = false;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                try {
+                    await navigator.clipboard.writeText(textToCopy);
+                    copiedSuccessfully = true;
+                } catch (err) {
+                    console.warn('Failed to copy using navigator.clipboard, falling back.', err);
+                }
+            } 
+            
+            if (!copiedSuccessfully) {
+                try {
+                    inputField.focus();
+                    inputField.select();
+                    document.execCommand('copy'); 
+                    copiedSuccessfully = true;
+                } catch (err) {
+                     console.error('Fallback copy failed:', err);
+                     copiedSuccessfully = false;
+                }
+            }
+
+            if (copiedSuccessfully) {
+                copyBtn.textContent = successText;
+                copyBtn.style.backgroundColor = '#17A2B8'; 
+                
+                setTimeout(() => {
+                    inputContainer.style.display = 'none'; 
+                    copyBtn.textContent = defaultText;
+                    copyBtn.style.backgroundColor = '#28a745'; 
+                }, 1000); 
+            }
+            
+            return copiedSuccessfully;
+        }
+
+        function showLinkInput(productId, productUrl) {
+            const card = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+            if (!card) return;
+            
+            // إخفاء جميع أشرطة الروابط الأخرى
+            document.querySelectorAll('.link-input-container').forEach(container => {
+                if (container.closest('.product-card') && container.closest('.product-card').dataset.productId !== productId.toString()) {
+                    container.style.display = 'none';
+                }
+            });
+
+            let inputContainer = card.querySelector('.link-input-container');
+            
+            const copyText = currentLang === 'ar' ? 'نسخ' : 'Copy';
+
+            if (inputContainer) {
+                inputContainer.style.display = 'flex';
+                inputContainer.querySelector('.link-input').value = productUrl;
+                inputContainer.querySelector('.manual-copy-btn').textContent = copyText;
+                inputContainer.querySelector('.manual-copy-btn').style.backgroundColor = '#28a745';
+            } else {
+                // إنشاء الحاوية إذا لم تكن موجودة
+                inputContainer = document.createElement('div');
+                inputContainer.className = 'link-input-container';
+                
+                // استخدام `manualCopy(productId)` مباشرة هنا
+                inputContainer.innerHTML = `
+                    <input type="text" class="link-input" value="${productUrl}" readonly>
+                    <button class="manual-copy-btn" onclick="manualCopy(${productId})">${copyText}</button>
+                `;
+                card.appendChild(inputContainer);
+                inputContainer.style.display = 'flex';
+            }
+            
+            setTimeout(() => {
+                const inputField = card.querySelector('.link-input');
+                if (inputField) {
+                    inputField.focus();
+                    inputField.select();
+                }
+            }, 50);
+        }
+
+        async function copyProductLink(productId, productUrl, productName) {
+            const decodedProductName = decodeURIComponent(productName); 
+            
+            const shareText = currentLang === 'ar' 
+                ? `🔥 شاهد هذا المنتج الرائع: ${decodedProductName}. رابط الشراء: ${productUrl}` 
+                : `🔥 Check out this great product: ${decodedProductName}. Purchase link: ${productUrl}`;
+                
+            const title = currentLang === 'ar' ? `منتج رائع من ${storeSettings.name}` : `Great Product from ${storeSettings.name}`;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: title,
+                        text: shareText,
+                        url: productUrl,
+                    });
+                    // إخفاء شريط النسخ في حال نجاح المشاركة عبر الـ API
+                    hideAllLinkInputs();
+                    return; 
+                } catch (error) {
+                    console.warn('Web Share API failed or was cancelled. Falling back to manual copy.');
+                }
+            }
+            
+            showLinkInput(productId, productUrl);
+        }
+
 
         // ------------------ إنشاء بطاقة المنتج ------------------
         function createProductCard(product) {
+            // استعادة حالة الإعجاب وعدد الإعجابات من localStorage
+            const storedIsLiked = localStorage.getItem(`product_like_${product.id}`) === 'true';
+            const storedLikesCountStr = localStorage.getItem(`product_likes_count_${product.id}`);
+            const storedLikesCount = storedLikesCountStr ? parseInt(storedLikesCountStr) : product.likesCount;
+            
+            product.isLiked = storedIsLiked;
+            product.likesCount = storedLikesCount;
+            
             const productName = currentLang === 'ar' ? product.name_ar : product.name_en;
             const productSizes = currentLang === 'ar' ? product.sizes_ar : product.sizes_en;
             const productLink = currentLang === 'ar' ? product.link_ar : product.link_en; 
-            const badgeYellow = currentLang === 'ar' ? product.badgeYellow_ar : product.badgeYellow_en;
+            // 💡 تحسين: استخدام الرابط الثاني كـ "عرض الصور" إذا كان متاحاً
+            const productImagesLink = product.images.length > 1 && product.images[1] ? product.images[1] : productLink; 
+
+            const badgeYellow = currentLang === 'ar' 
+                ? product.badgeYellow_ar || CATEGORIES_AR[product.category] 
+                : product.badgeYellow_en || CATEGORIES_EN[product.category]; 
             const badgeBlack = currentLang === 'ar' ? product.badgeBlack_ar : product.badgeBlack_en;
             
-            const buyText = currentLang === 'ar' 
-                ? `<i class="fas fa-credit-card"></i> شراء الآن` 
-                : `<i class="fas fa-credit-card"></i> Buy Now`;
-                
-            const showImagesText = currentLang === 'ar' 
-                ? `<i class="fas fa-images"></i> <span class="text-with-underline">عرض الصور</span>` 
-                : `<i class="fas fa-images"></i> <span class="text-with-underline">View Images</span>`; 
-                
+            const buyText = currentLang === 'ar' ? `شراء الآن` : `Buy Now`;
+            const showImagesText = currentLang === 'ar' ? `عرض الصور` : `View Images`; 
             const soldText = currentLang === 'ar' ? 'تم بيع' : 'Sold';
 
-            // النقطة المهمة: الحصول على أول صورة من مصفوفة images
             const mainImageUrl = product.images.length > 0 ? product.images[0] : `https://via.placeholder.com/800x800?text=No+Image+ID:${product.id}`;
 
             let badgesHtml = '';
@@ -784,32 +1661,34 @@
                 badgesHtml += `<span class="badge-black">${badgeBlack}</span>`;
             }
             
-            const isLiked = false; 
+            const isLiked = product.isLiked; 
             const likeClass = isLiked ? 'liked' : '';
             const likeIcon = isLiked ? 'fas fa-heart' : 'far fa-heart';
+
+            const safeProductName = encodeURIComponent(productName); 
             
             const card = `
-                <div class="product-card" data-product-id="${product.id}">
+                <div class="product-card" data-product-id="${product.id}" data-category="${product.category}" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
                     <div class="product-badges-container">
                         ${badgesHtml}
                     </div>
                     
-                    <div class="like-container" onclick="toggleLike(${product.id})">
+                    <div class="like-container" onclick="toggleLike(${product.id})" aria-label="Like product">
                         <i class="like-btn ${likeIcon} ${likeClass}"></i>
                         <div class="like-count">${formatCount(product.likesCount)}</div>
                     </div>
 
-                    <img src="${mainImageUrl}" alt="${productName}" class="product-image-main">
+                    <img src="${mainImageUrl}" alt="${productName}" class="product-image-main" loading="lazy">
                     
-                    <div class="product-info" style="padding: 15px;">
-                        <h3 class="product-name" style="font-size: 1.1em; margin: 0 0 5px 0; font-weight: 600; min-height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${productName}</h3>
+                    <div class="product-info">
+                        <h3 class="product-name">${productName}</h3>
                         
-                        <div class="product-meta" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                            <div class="product-rating" style="color: #FFC107;">
+                        <div class="product-meta">
+                            <div class="product-rating">
                                 ${generateStars(product.rating)}
-                                <span style="font-size: 0.8em; color: #555; margin-left: 5px;">(${product.rating})</span>
+                                <span>(${product.rating})</span>
                             </div>
-                            <div class="product-sold" style="font-size: 0.8em; color: #7f8c8d;">
+                            <div class="product-sold">
                                 ${soldText} ${formatCount(product.soldCount)}
                             </div>
                         </div>
@@ -818,8 +1697,16 @@
                         <div class="product-price">${product.price.toFixed(2)}$</div>
                         
                         <div class="product-actions">
-                            <a href="${productLink}" target="_blank" class="buy-now-btn">${buyText}</a>
-                            <a href="${productLink}" target="_blank" class="show-images-btn">${showImagesText}</a>
+                            
+                            <a href="${productLink}" target="_blank" class="buy-now-btn"><i class="fas fa-credit-card"></i> ${buyText}</a>
+                            
+                            <a href="${productImagesLink}" target="_blank" class="show-images-btn"><i class="fas fa-images"></i> ${showImagesText}</a>
+                            
+                            <button class="share-product-btn-footer" 
+                                 onclick="copyProductLink(${product.id}, '${productLink}', '${safeProductName}')" aria-label="Share Link"> 
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            
                         </div>
                     </div>
                 </div>
@@ -827,55 +1714,8 @@
             return card;
         }
 
-        // ------------------ وظيفة التبديل التلقائي للصور (Slideshow) ------------------
-        function updatePromoCard(elementId, items, currentIndex) {
-            const container = document.getElementById(elementId);
-            if (!container || items.length === 0) return 0;
-            
-            const newBadgeText = currentLang === 'ar' ? 'جديد' : 'New';
-            
-            if (!container.querySelector('.new-badge')) {
-                container.innerHTML = `<span class="new-badge">${newBadgeText}</span>` + 
-                    items.map((item, index) => `
-                        <a href="${item.link}" target="_blank" class="slider-item ${index === 0 ? 'active' : ''}">
-                            <img src="${item.url}" alt="Promo Item ${index + 1}" loading="lazy">
-                        </a>
-                    `).join('');
-            } else {
-                 container.querySelector('.new-badge').textContent = newBadgeText;
-            }
 
-            const slides = container.querySelectorAll('.slider-item');
-            slides.forEach(slide => slide.classList.remove('active'));
-            
-            let nextIndex = (currentIndex) % items.length;
-            slides[nextIndex].classList.add('active');
-
-            return nextIndex; 
-        }
-
-        function startPromoSlideshows() {
-            Object.values(slideshowIntervals).forEach(clearInterval);
-            slideshowIntervals = {};
-            
-            promoCardIndex1 = 0;
-            promoCardIndex2 = 0;
-            
-            promoCardIndex1 = updatePromoCard('promoItem1', bannerData.item1, promoCardIndex1);
-            promoCardIndex2 = updatePromoCard('promoItem2', bannerData.item2, promoCardIndex2);
-            
-            slideshowIntervals.item1 = setInterval(() => {
-                promoCardIndex1 = (promoCardIndex1 + 1) % bannerData.item1.length;
-                updatePromoCard('promoItem1', bannerData.item1, promoCardIndex1);
-            }, 4000); 
-
-            slideshowIntervals.item2 = setInterval(() => {
-                promoCardIndex2 = (promoCardIndex2 + 1) % bannerData.item2.length;
-                updatePromoCard('promoItem2', bannerData.item2, promoCardIndex2);
-            }, 4000); 
-        }
-        
-        // ------------------ تحميل المزيد من المنتجات (الرقم 6 غير موجود هنا) ------------------
+        // ------------------ وظيفة تحميل المنتجات ------------------
         function loadProducts(reset = false) {
             const container = document.getElementById('categoryBlocksContainer');
             const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -885,26 +1725,30 @@
                 container.innerHTML = '';
                 currentProductIndex = 0; 
             }
-            
-            const remainingProducts = productsData.slice(currentProductIndex);
+
+            const remainingProducts = filteredProducts.slice(currentProductIndex);
             const productsToLoad = remainingProducts.slice(0, PRODUCTS_PER_LOAD); 
 
+            const fragment = document.createDocumentFragment();
             productsToLoad.forEach(product => {
-                container.innerHTML += createProductCard(product);
+                 const tempDiv = document.createElement('div');
+                 tempDiv.innerHTML = createProductCard(product).trim();
+                 fragment.appendChild(tempDiv.firstChild);
             });
+            container.appendChild(fragment);
 
             currentProductIndex += productsToLoad.length;
             
-            if (currentProductIndex < productsData.length) {
-                loadMoreBtn.style.display = 'block'; 
+            // تحديث حالة زر "عرض المزيد"
+            if (currentProductIndex < filteredProducts.length) {
+                loadMoreBtn.style.display = 'flex'; 
                 loadMoreBtn.classList.remove('disabled-btn');
 
-                // 💥 تم التأكد من أن النص يظهر "عرض المزيد" فقط بدون أي رقم 💥
                 const moreTxt = currentLang === 'ar' ? `عرض المزيد` : `Load More`;
                 loadMoreText.textContent = moreTxt;
                 
-            } else if (productsData.length > PRODUCTS_PER_LOAD) {
-                loadMoreBtn.style.display = 'block';
+            } else if (filteredProducts.length > 0 && currentProductIndex === filteredProducts.length) {
+                loadMoreBtn.style.display = 'flex'; 
                 loadMoreBtn.classList.add('disabled-btn');
                 loadMoreText.textContent = currentLang === 'ar' ? 'تم عرض جميع المنتجات' : 'All Products Shown';
             } else {
@@ -912,94 +1756,219 @@
             }
         }
         
-        // ------------------ تبديل حالة الإعجاب ------------------
-        function toggleLike(productId) {
-            const product = productsData.find(p => p.id === productId);
-            if (product) {
-                const likeBtn = document.querySelector(`.product-card[data-product-id="${productId}"] .like-btn`);
-                const likeCountDiv = document.querySelector(`.product-card[data-product-id="${productId}"] .like-count`);
+        // ------------------ وظائف إدارة الـ Modal وكلمة المرور ------------------
+        
+        // 🟢 وظيفة لإظهار وإخفاء مربع كلمة المرور بأناقة
+        function togglePasswordBox(show) {
+            const passwordContainer = document.getElementById('password-container');
+            const passwordInput = document.getElementById('password-input');
+            if (!passwordContainer) return;
 
-                if (likeBtn.classList.contains('liked')) {
-                    likeBtn.classList.remove('liked', 'fas');
-                    likeBtn.classList.add('far');
-                    product.likesCount -= 1; 
-                } else {
-                    likeBtn.classList.add('liked', 'fas');
-                    likeBtn.classList.remove('far');
-                    product.likesCount += 1; 
-                }
-                likeCountDiv.textContent = formatCount(product.likesCount);
+            if (show) {
+                passwordContainer.style.display = 'block'; 
+                setTimeout(() => {
+                    passwordContainer.classList.add('visible');
+                    passwordInput.focus();
+                }, 10);
+            } else {
+                passwordContainer.classList.remove('visible');
+                setTimeout(() => {
+                    passwordContainer.style.display = 'none';
+                }, 400); 
             }
         }
-
-        // ------------------ تحديث عناصر البانر (غير السلايدر) ------------------
-        function updateStaticBannerContent() {
-            const specialProductData = bannerData.specialProduct;
-            const fixedOfferData = bannerData.fixedOffer;
+        
+        // 🟢 وظيفة لإعادة تعيين حالة زر الإدراج
+        function resetInsertButtonState() {
+            const insertBtn = document.getElementById('insertBtn');
+            const passwordInput = document.getElementById('password-input');
+            if(!insertBtn) return;
             
-            document.getElementById('promoBannerSection').style.backgroundImage = `url('${bannerData.backgroundUrl}')`;
-            
-            // 💥 التعديل الرئيسي على اسم المتجر ونص الوكيل - تضمين أيقونة AliExpress 💥
-            document.getElementById('storeNameBanner').textContent = storeSettings.name;
-            document.getElementById('storeTitle').textContent = storeSettings.name;
-            
-            // أيقونة AliExpress
-            const agentTextContent = currentLang === 'ar' 
-                ? 'وكيل معتمد لمتجر AliExpress <i class="fab fa-aliexpress-square"></i>' 
-                : 'Authorized agent for AliExpress store <i class="fab fa-aliexpress-square"></i>';
-                
-            document.getElementById('authorizedAgentText').innerHTML = agentTextContent;
-            
-            document.getElementById('specialProductPrice').innerHTML = specialProductData.price;
-            document.getElementById('specialProductStars').innerHTML = generateStars(specialProductData.rating);
-            document.getElementById('specialProductLink').href = specialProductData.link;
-            document.getElementById('specialProductLink').textContent = currentLang === 'ar' ? 'احصل على الجديد' : 'Get new';
-            
-            document.getElementById('fixedOfferImage').src = fixedOfferData.imageUrl;
-            document.getElementById('fixedOfferAmount').innerHTML = currentLang === 'ar' ? fixedOfferData.amount_ar : fixedOfferData.amount_en;
-            document.getElementById('fixedOfferText').textContent = currentLang === 'ar' ? fixedOfferData.text_ar : fixedOfferData.text_en; 
-            
-            document.getElementById('getNowLink').href = fixedOfferData.link;
-            document.getElementById('getNowLink').textContent = currentLang === 'ar' ? 'احصل الآن' : 'Get Now';
-        }
-
-        // ------------------ وظيفة تبديل اللغة وإعادة تحميل جميع المكونات ------------------
-        function setLanguageAndReload(lang) {
-             currentLang = lang; 
-             const dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-             
-             document.documentElement.lang = currentLang;
-             document.documentElement.dir = dir;
-             document.body.style.direction = dir; 
-             
-             document.getElementById('toggleLangBtn').textContent = currentLang === 'ar' ? 'EN' : 'AR';
-             
-             document.getElementById('favicon').href = storeSettings.faviconUrl;
-
-             updateStaticBannerContent();
-             startPromoSlideshows();
-
-             loadProducts(true); 
+            insertBtn.classList.remove('success');
+            insertBtn.textContent = currentLang === 'ar' ? 'إدراج' : 'Insert';
+            isPasswordCorrect = false;
+            if(passwordInput) {
+                passwordInput.value = '';
+                passwordInput.classList.remove('error');
+            }
         }
         
-        // ------------------ وظيفة التبديل اليدوي ------------------
-        function toggleLanguage() {
-            const newLang = currentLang === 'ar' ? 'en' : 'ar';
-            setLanguageAndReload(newLang);
+        // 🟢 وظيفة التعامل مع إضافة منتج جديد (مُعدلة)
+        function handleProductFormSubmit(e) {
+            e.preventDefault();
+            
+            // 🚨 التحقق من كلمة المرور قبل تنفيذ الإدراج
+            if (!isPasswordCorrect) {
+                 const insertBtn = document.getElementById('insertBtn');
+                 // إذا لم يكن الزر في حالة النجاح، اعرض مربع كلمة المرور
+                 if (!insertBtn.classList.contains('success')) { 
+                     togglePasswordBox(true);
+                 }
+                return;
+            }
+            
+            // **تنفيذ الإدراج الفعلي (يتم فقط إذا كانت isPasswordCorrect = true)**
+            const categoryValue = document.getElementById('productCategory').value;
+            const productNameAr = document.getElementById('productNameAr').value;
+            const productImageUrl = document.getElementById('productImageUrl').value;
+            const productPrice = parseFloat(document.getElementById('productPrice').value);
+            const productLink = document.getElementById('productLink').value;
+            const productImagesLink = document.getElementById('productImagesLink').value; 
+            const productSizesAr = document.getElementById('productSizesAr').value;
+
+
+            const newProduct = {
+                id: nextProductId++,
+                category: categoryValue,
+                name_ar: productNameAr,
+                name_en: productNameAr, 
+                code: 'NEW' + (nextProductId - 1),
+                price: productPrice,
+                rating: 5.0, 
+                soldCount: 0,
+                likesCount: 0,
+                isLiked: false,
+                link_ar: productLink,
+                link_en: productLink,
+                sizes_ar: productSizesAr,
+                sizes_en: productSizesAr,
+                badgeYellow_ar: CATEGORIES_AR[categoryValue] || categoryValue,
+                badgeYellow_en: CATEGORIES_EN[categoryValue] || categoryValue,
+                badgeBlack_ar: 'منتج مُضاف',
+                badgeBlack_en: 'Added Item',
+                images: [productImageUrl, productImagesLink] // يمكن إضافة رابطين هنا
+            };
+
+            productsData.unshift(newProduct); 
+            
+            filterProducts(currentCategory); // إعادة تحميل عرض المنتجات
+
+            // إخفاء الـ Modal وتنظيف النموذج وإعادة تعيين حالة التحقق
+            document.getElementById('addProductModal').style.display = 'none';
+            this.reset();
+            resetInsertButtonState();
+            togglePasswordBox(false); 
+            
+            alert(currentLang === 'ar' ? `✅ تم إدراج المنتج بنجاح: ${newProduct.name_ar}` : `✅ Product inserted successfully: ${newProduct.name_en}`);
         }
         
-        // ------------------ وظيفة التهيئة عند تحميل الصفحة ------------------
+        // 🟢 وظيفة التحقق من كلمة المرور (Logic)
+        function setupPasswordCheck() {
+            const insertBtn = document.getElementById('insertBtn');
+            const passwordInput = document.getElementById('password-input');
+            const modal = document.getElementById('addProductModal');
+            
+            if (!passwordInput || !insertBtn) return;
+
+            // 1. التحقق عند الإدخال
+            passwordInput.addEventListener('input', () => {
+                const enteredPassword = passwordInput.value;
+
+                if (enteredPassword.length === 8) {
+                    if (enteredPassword === CORRECT_PASSWORD) {
+                        isPasswordCorrect = true;
+                        insertBtn.classList.add('success'); 
+                        passwordInput.classList.remove('error');
+                        passwordInput.blur(); 
+                        insertBtn.textContent = currentLang === 'ar' ? 'تم التحقق ✓' : 'Verified ✓';
+                        togglePasswordBox(false); // إخفاء بعد التحقق بنجاح
+                    } else {
+                        isPasswordCorrect = false;
+                        insertBtn.classList.remove('success');
+                        passwordInput.classList.add('error'); 
+                        insertBtn.textContent = currentLang === 'ar' ? 'إدراج' : 'Insert';
+                    }
+                } else {
+                    isPasswordCorrect = false;
+                    insertBtn.classList.remove('success');
+                    passwordInput.classList.remove('error');
+                    insertBtn.textContent = currentLang === 'ar' ? 'إدراج' : 'Insert';
+                }
+            });
+            
+            // 2. إخفاء مربع كلمة المرور عند إغلاق الـ Modal
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            closeModalBtn.addEventListener('click', () => {
+                document.getElementById('addProductModal').style.display = 'none';
+                resetInsertButtonState();
+                togglePasswordBox(false);
+            });
+            window.addEventListener('click', (event) => {
+                 if (event.target === modal) {
+                    resetInsertButtonState();
+                    togglePasswordBox(false);
+                 }
+            });
+        }
+        
+        // ------------------ وظيفة التهيئة الرئيسية (Final Initialization) ------------------
         function initializeStore() {
+             const savedLang = localStorage.getItem('siteLang');
              const userLang = navigator.language.toLowerCase();
-             const initialLang = userLang.startsWith('ar') ? 'ar' : 'en'; 
+             const initialLang = savedLang || (userLang.startsWith('ar') ? 'ar' : 'en'); 
              
-             document.getElementById('toggleLangBtn').textContent = '...'; 
+             // 1. إرفاق معالجات الأحداث العامة
+             document.getElementById('loadMoreBtn').addEventListener('click', () => loadProducts());
+             document.getElementById('toggleLangBtn').addEventListener('click', toggleLanguage);
+             document.addEventListener('click', handleGlobalClick);
              
+             // 2. أحداث القائمة الجانبية (Sidebar)
+             document.getElementById('openMenuBtn').addEventListener('click', openNav);
+             document.getElementById('closeMenuBtn').addEventListener('click', closeNav);
+             /* 💡 تم إزالة حلقة إضافة المستمعين هنا، لأن createCategoryLinks() تتولى ذلك الآن */
+             
+             // 3. أحداث زر التواصل (Contact Button)
+             const contactModal = document.getElementById('contactModal');
+             document.getElementById('contactBtn').addEventListener('click', () => {
+                 contactModal.style.display = 'block';
+                 closeNav(); 
+             });
+             document.getElementById('closeContactModalBtn').addEventListener('click', () => {
+                contactModal.style.display = 'none';
+             });
+             document.getElementById('contactForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('contactEmail').value;
+                const message = document.getElementById('contactMessage').value;
+                const subject = currentLang === 'ar' ? `رسالة تواصل جديدة من متجر ${storeSettings.name}` : `New Contact Message from ${storeSettings.name} Store`;
+                const body = currentLang === 'ar' ? `المرسل: ${email}\n\nالرسالة:\n${message}` : `Sender Email: ${email}\n\nMessage:\n${message}`;
+
+                const mailtoLink = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoLink;
+
+                document.getElementById('contactModal').style.display = 'none';
+                this.reset();
+                
+                alert(currentLang === 'ar' ? '✅ تم فتح تطبيق البريد لإرسال رسالتك.' : '✅ Your email application has been opened to send your message.');
+             });
+
+             window.addEventListener('click', (event) => {
+                 if (event.target === contactModal) {
+                    contactModal.style.display = 'none';
+                 }
+             });
+
+
+             // 4. أحداث الـ Modal
+             document.getElementById('addProductBtn').addEventListener('click', () => {
+                 document.getElementById('addProductModal').style.display = 'block';
+                 closeNav(); 
+                 resetInsertButtonState(); // التأكد من إعادة التعيين عند الفتح
+             });
+             document.getElementById('productForm').addEventListener('submit', handleProductFormSubmit);
+             
+             // 5. إعداد منطق التحقق من كلمة المرور
+             setupPasswordCheck();
+             
+             // 6. تحميل المنتجات الأولية واللغة
+             // يجب تعيين اللغة أولاً لضمان تحميل النصوص الصحيحة
              setLanguageAndReload(initialLang);
+             filterProducts('all', false); // فلترة أولية دون إغلاق القائمة (في حال لم يتم فتحها)
         }
         
         document.addEventListener('DOMContentLoaded', initializeStore);
 
     </script>
 </body>
-      </html>
+</html>
