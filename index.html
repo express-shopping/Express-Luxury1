@@ -896,12 +896,17 @@
                 <option value="اخرى">أخرى</option>
             </select>
 
-            <label for="productNameAr" id="nameArLabelText">اسم المنتج:</label>
+            <label for="productNameAr" id="nameArLabelText">اسم المنتج (عربي):</label>
             <input type="text" id="productNameAr" required>
             
-            <label for="productSizesAr" id="sizesArLabelText">الألوان والمقاسات:</label>
+            <label for="productSizesAr" id="sizesArLabelText">الألوان والمقاسات (عربي):</label>
             <input type="text" id="productSizesAr" placeholder="مثال: للأعمار 3-8 سنوات، ألوان متعددة" required>
 
+            <label for="productNameEn" id="nameEnLabelText">اسم المنتج (إنجليزي):</label>
+            <input type="text" id="productNameEn" required>
+            
+            <label for="productSizesEn" id="sizesEnLabelText">الألوان والمقاسات (إنجليزي):</label>
+            <input type="text" id="productSizesEn" placeholder="Example: Ages 3-8, Multi Colors" required>
             <label for="productPrice" id="priceLabelText">السعر (بالدولار $):</label>
             <input type="number" id="productPrice" step="0.01" min="0.01" required>
 
@@ -1310,8 +1315,12 @@
             const labels = {
                 // Modal الإضافة
                 categoryLabelText: { ar: 'الفئة:', en: 'Category:' },
-                nameArLabelText: { ar: 'اسم المنتج:', en: 'Product Name:' }, 
-                sizesArLabelText: { ar: 'الألوان والمقاسات:', en: 'Colors and Sizes:' }, 
+                nameArLabelText: { ar: 'اسم المنتج (عربي):', en: 'Product Name (Arabic):' }, // 💡 تم تعديل النص
+                sizesArLabelText: { ar: 'الألوان والمقاسات (عربي):', en: 'Colors and Sizes (Arabic):' }, // 💡 تم تعديل النص
+                // 🚨 التسميات الجديدة
+                nameEnLabelText: { ar: 'اسم المنتج (إنجليزي):', en: 'Product Name (English):' },
+                sizesEnLabelText: { ar: 'الألوان والمقاسات (إنجليزي):', en: 'Colors and Sizes (English):' },
+                // 🚨 نهاية التسميات الجديدة
                 priceLabelText: { ar: 'السعر (بالدولار $):', en: 'Price (in $):' },
                 imagesLinkLabelText: { ar: 'رابط الصور (زر عرض الصور):', en: 'Images Link (View Images button):' },
                 linkLabelText: { ar: 'رابط الشراء (زر شراء الآن):', en: 'Purchase Link (Buy Now button):' },
@@ -1319,6 +1328,7 @@
                 
                 // Placeholder
                  productSizesAr: { ar: 'مثال: للأعمار 3-8 سنوات، ألوان متعددة', en: 'Example: Ages 3-8, Multi Colors' },
+                 productSizesEn: { ar: 'Example: Ages 3-8, Multi Colors', en: 'Example: Ages 3-8, Multi Colors' }, // 💡 تم إضافة البلايس هولدر الإنجليزي
                  passwordInput: { ar: 'كلمة المرور لتنفيذ الإدراج', en: 'Enter Password to Insert' },
                  
                  // Modal التواصل
@@ -1356,7 +1366,7 @@
             document.getElementById('categoriesTitle').textContent = currentLang === 'ar' ? 'تصفح الفئات:' : 'Browse Categories:';
             document.getElementById('modalTitle').textContent = currentLang === 'ar' ? 'إضافة منتج جديد' : 'Add New Product';
             
-            // 💡 تحديث نصوص شريط الـ Sidebar العلوي
+            // 💡 جديد: تحديث نصوص شريط الـ Sidebar العلوي
             document.getElementById('sidebarUsername').textContent = currentLang === 'ar' ? 'لوحة تحكم المتجر' : 'Store Control Panel';
             document.getElementById('sidebarStatus').textContent = currentLang === 'ar' ? 'وضع الإدارة' : 'Admin Mode';
             document.getElementById('contactText').textContent = currentLang === 'ar' ? 'تواصل' : 'Contact';
@@ -1377,29 +1387,26 @@
             container.innerHTML = ''; // تنظيف الحاوية
             
             const categoriesMap = currentLang === 'ar' ? CATEGORIES_AR : CATEGORIES_EN;
-            // إضافة "جميع المنتجات/All Products" أولاً
-            const allCategories = { 'all': categoriesMap['all'], ...categoriesMap }; 
+            const allCategories = { ...categoriesMap }; 
 
             for (const key in allCategories) {
-                if(key === 'all' || CATEGORIES_AR.hasOwnProperty(key)) { // تحقق من وجود الفئة في القائمة العربية أيضاً
-                    const link = document.createElement('a');
-                    link.href = "#";
-                    link.className = 'category-link';
-                    link.setAttribute('data-category', key);
-                    link.textContent = allCategories[key];
+                const link = document.createElement('a');
+                link.href = "#";
+                link.className = 'category-link';
+                link.setAttribute('data-category', key);
+                link.textContent = allCategories[key];
 
-                    link.addEventListener('click', function(e) {
-                         e.preventDefault();
-                         filterProducts(this.getAttribute('data-category'));
-                    });
-                    
-                    // تعيين الفئة النشطة بشكل صحيح عند الإنشاء
-                    if (key === currentCategory) {
-                        link.classList.add('active-category');
-                    }
-
-                    container.appendChild(link);
+                link.addEventListener('click', function(e) {
+                     e.preventDefault();
+                     filterProducts(this.getAttribute('data-category'));
+                });
+                
+                // تعيين الفئة النشطة بشكل صحيح عند الإنشاء
+                if (key === currentCategory) {
+                    link.classList.add('active-category');
                 }
+
+                container.appendChild(link);
             }
         }
         
@@ -1417,7 +1424,7 @@
              // 💡 تحديث وإعادة بناء الروابط عند تغيير اللغة
              createCategoryLinks(); 
              
-             // 🟢 التأكد من تحديث القائمة النشطة عند تغيير اللغة وإعادة تحميل المنتجات
+             // 🟢 التأكد من تحديث القائمة النشطة عند تغيير اللغة
              filterProducts(currentCategory, false); 
              
              localStorage.setItem('siteLang', currentLang);
@@ -1666,13 +1673,11 @@
             product.isLiked = storedIsLiked;
             product.likesCount = storedLikesCount;
             
-            // 🟢 الإصلاح: استخدام المتغيرات الإنجليزية بشكل صحيح عند تفعيل اللغة الإنجليزية
             const productName = currentLang === 'ar' ? product.name_ar : product.name_en;
             const productSizes = currentLang === 'ar' ? product.sizes_ar : product.sizes_en;
             const productLink = currentLang === 'ar' ? product.link_ar : product.link_en; 
-            
             // 💡 تحسين: استخدام الرابط الثاني كـ "عرض الصور" إذا كان متاحاً
-            const productImagesLink = product.images.length > 1 ? product.images[1] : productLink; 
+            const productImagesLink = product.images.length > 1 && product.images[1] ? product.images[1] : productLink; 
 
             const badgeYellow = currentLang === 'ar' 
                 ? product.badgeYellow_ar || CATEGORIES_AR[product.category] 
@@ -1822,11 +1827,10 @@
             if(passwordInput) {
                 passwordInput.value = '';
                 passwordInput.classList.remove('error');
-                passwordInput.placeholder = currentLang === 'ar' ? 'كلمة المرور لتنفيذ الإدراج' : 'Enter Password to Insert';
             }
         }
         
-        // 🟢 وظيفة التعامل مع إضافة منتج جديد (مُعدلة لنسخ القيمة العربية للإنجليزية)
+        // 🟢 وظيفة التعامل مع إضافة منتج جديد (مُعدلة لحفظ LocalStorage وتحديث اللغة)
         function handleProductFormSubmit(e) {
             e.preventDefault();
             
@@ -1845,17 +1849,23 @@
             const productNameAr = document.getElementById('productNameAr').value;
             const productSizesAr = document.getElementById('productSizesAr').value;
 
+            // 🚨 استرداد القيم الإنجليزية الجديدة 🚨
+            const productNameEn = document.getElementById('productNameEn').value;
+            const productSizesEn = document.getElementById('productSizesEn').value;
+            // 🚨 نهاية استرداد القيم الإنجليزية الجديدة 🚨
+
             const productImageUrl = document.getElementById('productImageUrl').value;
             const productPrice = parseFloat(document.getElementById('productPrice').value);
             const productLink = document.getElementById('productLink').value;
             const productImagesLink = document.getElementById('productImagesLink').value; 
             
-            // 🟢 هنا يتم النسخ التلقائي للبيانات العربية في الحقول الإنجليزية
+
+
             const newProduct = {
-                id: nextProductId++, 
+                id: nextProductId++, // استخدم الـ ID التالي
                 category: categoryValue,
                 name_ar: productNameAr,
-                name_en: productNameAr, // النسخ التلقائي
+                name_en: productNameEn, // 💡 استخدام القيمة الإنجليزية المدخلة
                 code: 'NEW' + (nextProductId - 1),
                 price: productPrice,
                 rating: 5.0, 
@@ -1865,9 +1875,9 @@
                 link_ar: productLink,
                 link_en: productLink,
                 sizes_ar: productSizesAr,
-                sizes_en: productSizesAr, // النسخ التلقائي
+                sizes_en: productSizesEn, // 💡 استخدام المقاسات الإنجليزية المدخلة
                 badgeYellow_ar: CATEGORIES_AR[categoryValue] || categoryValue,
-                badgeYellow_en: CATEGORIES_EN[categoryValue] || categoryValue, 
+                badgeYellow_en: CATEGORIES_EN[categoryValue] || categoryValue,
                 badgeBlack_ar: 'منتج مُضاف',
                 badgeBlack_en: 'Added Item',
                 images: [productImageUrl, productImagesLink] 
@@ -2039,5 +2049,4 @@
 
     </script>
 </body>
-</html>
-
+    </html>
